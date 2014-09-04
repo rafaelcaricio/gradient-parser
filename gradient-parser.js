@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var Parser = (function() {
+var GradientParser = module.exports = (function() {
 
   var types = {
     gradients: [
@@ -22,7 +22,9 @@ var Parser = (function() {
   function Constructor() {
   }
 
-  Constructor.prototype.parse = function(input) {
+  var def = Constructor.prototype;
+
+  def.parse = function(input) {
     return null;
   }
 
@@ -30,7 +32,7 @@ var Parser = (function() {
 })();
 
 
-var p = new Parser('linear-gradient(to right, transparent 10px, #c2c2c2 10px)');
+var p = new GradientParser('linear-gradient(to right, transparent 10px, #c2c2c2 10px)');
 var ast = p.parse();
 
 if (ast == [
