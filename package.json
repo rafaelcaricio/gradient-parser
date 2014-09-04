@@ -1,0 +1,25 @@
+{
+  "name": "gradient-parser",
+  "version": "0.0.0",
+  "description": "Parse gradient definitions and return AST.",
+  "main": "./parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafaelcaricio/gradient-parser.git"
+  },
+  "keywords": [
+    "parser",
+    "gradient",
+    "css",
+    "ast"
+  ],
+  "author": "Rafael Caricio <rafael@caricio.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rafaelcaricio/gradient-parser/issues"
+  },
+  "homepage": "https://github.com/rafaelcaricio/gradient-parser"
+}
