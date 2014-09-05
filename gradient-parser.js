@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var GradientParser = module.exports = (function() {
+module.exports = (function() {
 
   var types = {
     gradients: [
@@ -27,7 +27,10 @@ var GradientParser = module.exports = (function() {
     comma: /^,/
   };
 
-  function error(input, cursor, msg) {
+  var input = '',
+    cursor = 0;
+
+  function error(msg) {
     var err = new Error(input + ':' + cursor + ': ' + msg);
     err.position = cursor;
     err.message = msg;
@@ -35,37 +38,26 @@ var GradientParser = module.exports = (function() {
     throw err;
   }
 
-  function Constructor(input) {
-    this.input = input;
-    this.cursor = 0;
-  }
+  function getAST() {
+    var ast = listDefinitions();
 
-  var def = Constructor.prototype;
-
-  def.parse = function(input) {
-    if (input) {
-      this.input = input;
-    }
-
-    var ast = this.listDefinitions();
-
-    if (this.input) {
+    if (input.length > 0) {
       error(input, cursor, 'Invalid input not EOF');
     }
 
     return ast;
   };
 
-  def.listDefinitions = function() {
+  function listDefinitions() {
     var definitions = [],
-      definition = this.definition();
+      currentDefinition = definition();
 
-    if (definition) {
-      definitions.push(definition);
-      while (this.scan(tokens.comma)) {
-        definition = this.definition();
-        if (definition) {
-          definitions.push(definition);
+    if (currentDefinition) {
+      definitions.push(currentDefinition);
+      while (scan(tokens.comma)) {
+        currentDefinition = definition();
+        if (currentDefinition) {
+          definitions.push(currentDefinition);
         } else {
           // throw error
         }
@@ -73,24 +65,24 @@ var GradientParser = module.exports = (function() {
     }
 
     return definitions;
-  };
+  }
 
-  def.definition = function() {
-    return this.linearGradient();
-  };
+  function definition() {
+    return linearGradient();
+  }
 
-  def.linearGradient = function() {
-    var captures = this.scan(tokens.linearGradient),
+  function linearGradient() {
+    var captures = scan(tokens.linearGradient),
       orientation,
       colorStops;
 
 
     if (captures) {
-      this.scan(tokens.startCall);
-      orientation = this.orientation();
-      this.scan(tokens.comma);
-      colorStops = this.colorStops();
-      this.scan(tokens.endCall);
+      scan(tokens.startCall);
+      orientation = matchOrientation();
+      scan(tokens.comma);
+      colorStops = matchColorStops();
+      scan(tokens.endCall);
 
       return {
         type: 'linear-gradient',
@@ -98,31 +90,31 @@ var GradientParser = module.exports = (function() {
         colorStops: colorStops
       };
     }
-  };
+  }
 
-  def.orientation = function() {
-    return this.sideOrCorner();
-  };
+  function matchOrientation() {
+    return sideOrCorner();
+  }
 
-  def.sideOrCorner = function() {
-    var captures = this.scan(tokens.sideOrCorner);
+  function sideOrCorner() {
+    var captures = scan(tokens.sideOrCorner);
     if (captures) {
       return {
         type: 'directional',
         value: captures[1].toLowerCase()
       };
     }
-  };
+  }
 
-  def.colorStops = function() {
+  function matchColorStops() {
     var literalColors = /^([a-zA-Z]+)/,
-      captures = this.scan(literalColors),
+      captures = scan(literalColors),
       colors = [];
 
     if (captures) {
       colors.push(captures[0].toLowerCase());
-      while (this.scan(tokens.comma)) {
-        captures = this.scan(literalColors);
+      while (scan(tokens.comma)) {
+        captures = scan(literalColors);
         if (captures) {
           colors.push(captures[0].toLowerCase());
         } else {
@@ -132,29 +124,32 @@ var GradientParser = module.exports = (function() {
     }
 
     return colors;
-  };
+  }
 
-  def.scan = function(regexp) {
+  function scan(regexp) {
     var captures,
         blankCaptures;
 
-    blankCaptures = /^[\n\r\t\s]+/.exec(this.input);
+    blankCaptures = /^[\n\r\t\s]+/.exec(input);
     if (blankCaptures) {
-        this.consume(blankCaptures[0].length);
+        consume(blankCaptures[0].length);
     }
 
-    captures = regexp.exec(this.input);
+    captures = regexp.exec(input);
     if (captures) {
-        this.consume(captures[0].length);
+        consume(captures[0].length);
     }
 
     return captures;
-  };
+  }
 
-  def.consume = function(size) {
-    this.cursor += size;
-    this.input = this.input.substr(size);
-  };
+  function consume(size) {
+    cursor += size;
+    input = input.substr(size);
+  }
 
-  return Constructor;
+  return function(code) {
+    input = code.toString();
+    return getAST();
+  };
 })();

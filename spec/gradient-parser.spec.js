@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('expect.js');
-var GradientParser = require('gradient-parser');
+var gradientParser = require('gradient-parser');
 
 // [
 //   {
@@ -33,15 +33,14 @@ var GradientParser = require('gradient-parser');
 
 describe('gradient-parser.js', function () {
   it('should exist', function () {
-    expect(typeof GradientParser).to.equal('function');
+    expect(typeof gradientParser).to.equal('function');
   });
 
   describe('when parsing a simple definition', function(){
     var ast;
 
     beforeEach(function() {
-      var parser = new GradientParser();
-      ast = parser.parse('linear-gradient(to right bottom, red, blue)');
+      ast = gradientParser('linear-gradient(to right bottom, red, blue)');
     });
 
     it('should get the gradient type', function () {
