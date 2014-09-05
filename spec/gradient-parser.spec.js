@@ -42,7 +42,6 @@ describe('gradient-parser.js', function () {
     beforeEach(function() {
       var parser = new GradientParser();
       ast = parser.parse('linear-gradient(to right bottom, red, blue)');
-      console.log(ast);
     });
 
     it('should get the gradient type', function () {

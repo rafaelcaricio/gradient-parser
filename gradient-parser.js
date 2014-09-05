@@ -27,6 +27,14 @@ var GradientParser = module.exports = (function() {
     comma: /^,/
   };
 
+  function error(input, cursor, msg) {
+    var err = new Error(input + ':' + cursor + ': ' + msg);
+    err.position = cursor;
+    err.message = msg;
+    err.source = input;
+    throw err;
+  }
+
   function Constructor(input) {
     this.input = input;
     this.cursor = 0;
@@ -38,7 +46,14 @@ var GradientParser = module.exports = (function() {
     if (input) {
       this.input = input;
     }
-    return this.listDefinitions();
+
+    var ast = this.listDefinitions();
+
+    if (this.input) {
+      error(input, cursor, 'Invalid input not EOF');
+    }
+
+    return ast;
   };
 
   def.listDefinitions = function() {
