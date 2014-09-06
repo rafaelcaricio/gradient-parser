@@ -21,6 +21,7 @@ module.exports = (function() {
 
   var tokens = {
     linearGradient: /^linear\-gradient/i,
+    radialGradient: /^radial\-gradient/i,
     sideOrCorner: /^to (left (top|bottom)|right (top|bottom)|left|right|top|bottom)/i,
     startCall: /^\(/,
     endCall: /^\)/,
@@ -68,11 +69,14 @@ module.exports = (function() {
   }
 
   function matchDefinition() {
-    return matchLinearGradient();
+    return matchGradient(
+            'linear-gradient',
+            tokens.linearGradient,
+            matchOrientation);
   }
 
-  function matchLinearGradient() {
-    var captures = scan(tokens.linearGradient),
+  function matchGradient(gradientType, token, orientationMatcher) {
+    var captures = scan(token),
       orientation,
       colorStops;
 
@@ -81,7 +85,7 @@ module.exports = (function() {
         error('Missing (');
       }
 
-      orientation = matchOrientation();
+      orientation = orientationMatcher();
       if (orientation) {
         if (!scan(tokens.comma)) {
           error('Missing comma before color stops');
@@ -98,7 +102,7 @@ module.exports = (function() {
       }
 
       return {
-        type: 'linear-gradient',
+        type: gradientType,
         orientation: orientation,
         colorStops: colorStops
       };
