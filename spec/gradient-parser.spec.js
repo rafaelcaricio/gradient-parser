@@ -39,44 +39,44 @@ describe('gradient-parser.js', function () {
     expect(typeof gradientParser).to.equal('function');
   });
 
-  describe('when parsing wrong definition should throw an error', function() {
-    it('when there\'s one more comma in definitions', function() {
+  describe('error cases', function() {
+    it('one more comma in definitions', function() {
       expect(function() {
         gradientParser('linear-gradient(red, blue),');
       }).to.throwException(/One extra comma/);
     });
 
-    it('when there\'s one more comma in colors', function() {
+    it('one more comma in colors', function() {
       expect(function() {
         gradientParser('linear-gradient(red, blue,)');
       }).to.throwException(/Expected color definition/);
     });
 
-    it('when there\'s invalid input', function() {
+    it('invalid input', function() {
       expect(function() {
         gradientParser('linear-gradient(red, blue) aaa');
       }).to.throwException(/Invalid input not EOF/);
     });
 
-    it('when there\'s missing open call', function() {
+    it('missing open call', function() {
       expect(function() {
         gradientParser('linear-gradient red, blue');
       }).to.throwException(/Missing \(/);
     });
 
-    it('when there\'s missing comma before color stops', function() {
+    it('missing comma before color stops', function() {
       expect(function() {
         gradientParser('linear-gradient(to right red, blue)');
       }).to.throwException(/Missing comma before color stops/);
     });
 
-    it('when there\'s missing color stops', function() {
+    it('missing color stops', function() {
       expect(function() {
         gradientParser('linear-gradient(to right, )');
       }).to.throwException(/Expected color definition/);
     });
 
-    it('when there\'s missing closing call', function() {
+    it('missing closing call', function() {
       expect(function() {
         gradientParser('linear-gradient(to right, red, blue aaa');
       }).to.throwException(/Missing \)/);
@@ -132,20 +132,22 @@ describe('gradient-parser.js', function () {
     });
   });
 
-  describe('parse an definition with full color stop', function() {
-    beforeEach(function() {
-      ast = gradientParser('linear-gradient(blue 10px, transparent)');
-      subject = ast[0];
-    });
-
-    describe('the first color', function() {
+  ['px', 'em', '%'].forEach(function(metric) {
+    describe('parse color stop for metric '+ metric, function() {
       beforeEach(function() {
-        subject = subject.colorStops[0];
+        ast = gradientParser('linear-gradient(blue 10' + metric + ', transparent)');
+        subject = ast[0];
       });
 
-      it('should have the length', function() {
-        expect(subject.length.type).to.equal('px');
-        expect(subject.length.value).to.equal('10');
+      describe('the first color', function() {
+        beforeEach(function() {
+          subject = subject.colorStops[0];
+        });
+
+        it('should have the length', function() {
+          expect(subject.length.type).to.equal(metric);
+          expect(subject.length.value).to.equal('10');
+        });
       });
     });
   });

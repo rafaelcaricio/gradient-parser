@@ -27,6 +27,8 @@ module.exports = (function() {
     radialGradient: /^radial\-gradient/i,
     sideOrCorner: /^to (left (top|bottom)|right (top|bottom)|left|right|top|bottom)/i,
     pixelValue: /^([0-9]+)px/,
+    percentageValue: /^([0-9]+)\%/,
+    emValue: /^([0-9]+)em/,
     startCall: /^\(/,
     endCall: /^\)/,
     comma: /^,/
@@ -38,7 +40,7 @@ module.exports = (function() {
   function error(msg) {
     var err = new Error(input + ':' + cursor + ': ' + msg);
     err.position = cursor;
-    err.message = msg;
+    //err.message = msg;
     err.source = input;
     throw err;
   }
@@ -79,8 +81,8 @@ module.exports = (function() {
             matchOrientation);
   }
 
-  function matchGradient(gradientType, token, orientationMatcher) {
-    var captures = scan(token),
+  function matchGradient(gradientType, pattern, orientationMatcher) {
+    var captures = scan(pattern),
       orientation,
       colorStops;
 
@@ -174,14 +176,16 @@ module.exports = (function() {
   }
 
   function matchLength() {
-    return matchPixel();
+    return matchMetric(tokens.pixelValue, 'px') ||
+      matchMetric(tokens.percentageValue, '%') ||
+      matchMetric(tokens.emValue, 'em');
   }
 
-  function matchPixel() {
-    var captures = scan(tokens.pixelValue);
+  function matchMetric(pattern, metric) {
+    var captures = scan(pattern);
     if (captures) {
       return {
-        type: 'px',
+        type: metric,
         value: captures[1]
       };
     }
