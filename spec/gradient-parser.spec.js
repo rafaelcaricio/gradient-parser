@@ -153,7 +153,7 @@ describe('gradient-parser.js', function () {
   });
 
   [
-    {type: 'angle', unparsedValue: '145deg', value: '145'},
+    {type: 'angular', unparsedValue: '145deg', value: '145'},
     {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
   ].forEach(function(orientation) {
     describe('parse orientation ' + orientation.type, function() {

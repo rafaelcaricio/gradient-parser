@@ -113,23 +113,11 @@ module.exports = (function() {
   }
 
   function matchSideOrCorner() {
-    var captures = scan(tokens.sideOrCorner);
-    if (captures) {
-      return {
-        type: 'directional',
-        value: captures[1].toLowerCase()
-      };
-    }
+    return match('directional', tokens.sideOrCorner, 1);
   }
 
   function matchAngle() {
-    var captures = scan(tokens.angleValue);
-    if (captures) {
-      return {
-        type: 'angle',
-        value: captures[1]
-      };
-    }
+    return match('angular', tokens.angleValue, 1);
   }
 
   function matchListing(matcher) {
@@ -170,25 +158,11 @@ module.exports = (function() {
   }
 
   function matchLiteralColor() {
-    var captures = scan(tokens.literalColor);
-
-    if (captures) {
-      return {
-        type: 'literal',
-        value: captures[0].toLowerCase()
-      };
-    }
+    return match('literal', tokens.literalColor, 0);
   }
 
   function matchHexColor() {
-    var captures = scan(tokens.hexColor);
-
-    if (captures) {
-      return {
-        type: 'hex',
-        value: captures[1]
-      };
-    }
+    return match('hex', tokens.hexColor, 1);
   }
 
   function matchRGBColor() {
@@ -214,17 +188,17 @@ module.exports = (function() {
   }
 
   function matchLength() {
-    return matchMetric(tokens.pixelValue, 'px') ||
-      matchMetric(tokens.percentageValue, '%') ||
-      matchMetric(tokens.emValue, 'em');
+    return match('px', tokens.pixelValue, 1) ||
+      match('%', tokens.percentageValue, 1) ||
+      match('em', tokens.emValue, 1);
   }
 
-  function matchMetric(pattern, metric) {
+  function match(type, pattern, captureIndex) {
     var captures = scan(pattern);
     if (captures) {
       return {
-        type: metric,
-        value: captures[1]
+        type: type,
+        value: captures[captureIndex]
       };
     }
   }
