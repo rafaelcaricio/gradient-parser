@@ -49,7 +49,7 @@ describe('gradient-parser.js', function () {
     it('when there\'s one more comma in colors', function() {
       expect(function() {
         gradientParser('linear-gradient(red, blue,)');
-      }).to.throwException(/One extra comma/);
+      }).to.throwException(/Expected color definition/);
     });
 
     it('when there\'s invalid input', function() {
@@ -73,7 +73,7 @@ describe('gradient-parser.js', function () {
     it('when there\'s missing color stops', function() {
       expect(function() {
         gradientParser('linear-gradient(to right, )');
-      }).to.throwException(/Missing color definitions/);
+      }).to.throwException(/Expected color definition/);
     });
 
     it('when there\'s missing closing call', function() {
@@ -83,7 +83,7 @@ describe('gradient-parser.js', function () {
     });
   });
 
-  describe('when parsing a simple definition', function(){
+  describe('when parsing a simple definition', function() {
     beforeEach(function() {
       ast = gradientParser('linear-gradient(red, blue)');
       subject = ast[0];
@@ -128,6 +128,24 @@ describe('gradient-parser.js', function () {
         it('should get the right color', function() {
           expect(subject.value).to.equal('blue');
         });
+      });
+    });
+  });
+
+  describe('parse an definition with full color stop', function() {
+    beforeEach(function() {
+      ast = gradientParser('linear-gradient(blue 10px, transparent)');
+      subject = ast[0];
+    });
+
+    describe('the first color', function() {
+      beforeEach(function() {
+        subject = subject.colorStops[0];
+      });
+
+      it('should have the length', function() {
+        expect(subject.length.type).to.equal('px');
+        expect(subject.length.value).to.equal('10');
       });
     });
   });

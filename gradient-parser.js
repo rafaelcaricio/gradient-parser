@@ -16,6 +16,9 @@ module.exports = (function() {
       'rgba',
       'hsl',
       'literal'
+    ],
+    metrics: [
+      'px'
     ]
   };
 
@@ -23,6 +26,7 @@ module.exports = (function() {
     linearGradient: /^linear\-gradient/i,
     radialGradient: /^radial\-gradient/i,
     sideOrCorner: /^to (left (top|bottom)|right (top|bottom)|left|right|top|bottom)/i,
+    pixelValue: /^([0-9]+)px/,
     startCall: /^\(/,
     endCall: /^\)/,
     comma: /^,/
@@ -143,6 +147,17 @@ module.exports = (function() {
   }
 
   function matchColorStop() {
+    var color = matchColor();
+
+    if (!color) {
+      error('Expected color definition');
+    }
+
+    color.length = matchLength();
+    return color;
+  }
+
+  function matchColor() {
     return matchLiteralColor();
   }
 
@@ -154,6 +169,20 @@ module.exports = (function() {
       return {
         type: 'literal',
         value: captures[0].toLowerCase()
+      };
+    }
+  }
+
+  function matchLength() {
+    return matchPixel();
+  }
+
+  function matchPixel() {
+    var captures = scan(tokens.pixelValue);
+    if (captures) {
+      return {
+        type: 'px',
+        value: captures[1]
       };
     }
   }
