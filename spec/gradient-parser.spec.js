@@ -159,13 +159,30 @@ describe('gradient-parser.js', function () {
     describe('parse orientation ' + orientation.type, function() {
       beforeEach(function() {
         ast = gradientParser('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
-        subject = ast[0];
+        subject = ast[0].orientation;
       });
 
-      it('should parse the ' + orientation.type + ' orientation', function() {
-        expect(subject.orientation.type).to.equal(orientation.type);
-        expect(subject.orientation.value).to.equal(orientation.value);
+      it('should parse value', function() {
+        expect(subject.type).to.equal(orientation.type);
+        expect(subject.value).to.equal(orientation.value);
       });
+    });
+  });
+
+  [
+    {type: 'literal', unparsedValue: 'red', value: 'red'},
+    {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'}
+  ].forEach(function(color) {
+    describe('parse color type '+ color.type, function() {
+      beforeEach(function() {
+          ast = gradientParser('linear-gradient(12deg, ' + color.unparsedValue + ', blue, green)');
+          subject = ast[0].colorStops[0];
+        });
+
+        it('should parse value', function() {
+          expect(subject.type).to.equal(color.type);
+          expect(subject.value).to.equal(color.value);
+        });
     });
   });
 });

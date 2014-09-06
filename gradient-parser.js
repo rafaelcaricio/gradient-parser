@@ -32,7 +32,9 @@ module.exports = (function() {
     angleValue: /^([0-9]+)deg/,
     startCall: /^\(/,
     endCall: /^\)/,
-    comma: /^,/
+    comma: /^,/,
+    hexColor: /^\#([0-9a-fA-F]+)/,
+    literalColor: /^([a-zA-Z]+)/
   };
 
   var input = '',
@@ -172,17 +174,28 @@ module.exports = (function() {
   }
 
   function matchColor() {
-    return matchLiteralColor();
+    return matchLiteralColor() ||
+      matchHexColor();
   }
 
   function matchLiteralColor() {
-    var literalColors = /^([a-zA-Z]+)/,
-      captures = scan(literalColors);
+    var captures = scan(tokens.literalColor);
 
     if (captures) {
       return {
         type: 'literal',
         value: captures[0].toLowerCase()
+      };
+    }
+  }
+
+  function matchHexColor() {
+    var captures = scan(tokens.hexColor);
+
+    if (captures) {
+      return {
+        type: 'hex',
+        value: captures[1]
       };
     }
   }
