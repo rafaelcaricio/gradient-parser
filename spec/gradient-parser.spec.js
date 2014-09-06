@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('expect.js');
-var gradientParser = require('gradient-parser');
+var gradients = require('index');
 
 // [
 //   {
@@ -36,56 +36,56 @@ describe('gradient-parser.js', function () {
     subject;
 
   it('should exist', function () {
-    expect(typeof gradientParser).to.equal('function');
+    expect(typeof gradients.parse).to.equal('function');
   });
 
   describe('error cases', function() {
     it('one more comma in definitions', function() {
       expect(function() {
-        gradientParser('linear-gradient(red, blue),');
+        gradients.parse('linear-gradient(red, blue),');
       }).to.throwException(/One extra comma/);
     });
 
     it('one more comma in colors', function() {
       expect(function() {
-        gradientParser('linear-gradient(red, blue,)');
+        gradients.parse('linear-gradient(red, blue,)');
       }).to.throwException(/Expected color definition/);
     });
 
     it('invalid input', function() {
       expect(function() {
-        gradientParser('linear-gradient(red, blue) aaa');
+        gradients.parse('linear-gradient(red, blue) aaa');
       }).to.throwException(/Invalid input not EOF/);
     });
 
     it('missing open call', function() {
       expect(function() {
-        gradientParser('linear-gradient red, blue');
+        gradients.parse('linear-gradient red, blue');
       }).to.throwException(/Missing \(/);
     });
 
     it('missing comma before color stops', function() {
       expect(function() {
-        gradientParser('linear-gradient(to right red, blue)');
+        gradients.parse('linear-gradient(to right red, blue)');
       }).to.throwException(/Missing comma before color stops/);
     });
 
     it('missing color stops', function() {
       expect(function() {
-        gradientParser('linear-gradient(to right, )');
+        gradients.parse('linear-gradient(to right, )');
       }).to.throwException(/Expected color definition/);
     });
 
     it('missing closing call', function() {
       expect(function() {
-        gradientParser('linear-gradient(to right, red, blue aaa');
+        gradients.parse('linear-gradient(to right, red, blue aaa');
       }).to.throwException(/Missing \)/);
     });
   });
 
   describe('when parsing a simple definition', function() {
     beforeEach(function() {
-      ast = gradientParser('linear-gradient(red, blue)');
+      ast = gradients.parse('linear-gradient(red, blue)');
       subject = ast[0];
     });
 
@@ -135,7 +135,7 @@ describe('gradient-parser.js', function () {
   ['px', 'em', '%'].forEach(function(metric) {
     describe('parse color stop for metric '+ metric, function() {
       beforeEach(function() {
-        ast = gradientParser('linear-gradient(blue 10' + metric + ', transparent)');
+        ast = gradients.parse('linear-gradient(blue 10' + metric + ', transparent)');
         subject = ast[0];
       });
 
@@ -158,7 +158,7 @@ describe('gradient-parser.js', function () {
   ].forEach(function(orientation) {
     describe('parse orientation ' + orientation.type, function() {
       beforeEach(function() {
-        ast = gradientParser('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
+        ast = gradients.parse('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
         subject = ast[0].orientation;
       });
 
@@ -177,7 +177,7 @@ describe('gradient-parser.js', function () {
   ].forEach(function(color) {
     describe('parse color type '+ color.type, function() {
       beforeEach(function() {
-          ast = gradientParser('linear-gradient(12deg, ' + color.unparsedValue + ', blue, green)');
+          ast = gradients.parse('linear-gradient(12deg, ' + color.unparsedValue + ', blue, green)');
           subject = ast[0].colorStops[0];
         });
 
