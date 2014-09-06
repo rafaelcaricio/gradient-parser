@@ -39,27 +39,27 @@ module.exports = (function() {
   }
 
   function getAST() {
-    var ast = listDefinitions();
+    var ast = matchListDefinitions();
 
     if (input.length > 0) {
-      error(input, cursor, 'Invalid input not EOF');
+      error('Invalid input not EOF');
     }
 
     return ast;
-  };
+  }
 
-  function listDefinitions() {
+  function matchListDefinitions() {
     var definitions = [],
-      currentDefinition = definition();
+      currentDefinition = matchDefinition();
 
     if (currentDefinition) {
       definitions.push(currentDefinition);
       while (scan(tokens.comma)) {
-        currentDefinition = definition();
+        currentDefinition = matchDefinition();
         if (currentDefinition) {
           definitions.push(currentDefinition);
         } else {
-          // throw error
+          error('One extra comma');
         }
       }
     }
@@ -67,22 +67,35 @@ module.exports = (function() {
     return definitions;
   }
 
-  function definition() {
-    return linearGradient();
+  function matchDefinition() {
+    return matchLinearGradient();
   }
 
-  function linearGradient() {
+  function matchLinearGradient() {
     var captures = scan(tokens.linearGradient),
       orientation,
       colorStops;
 
-
     if (captures) {
-      scan(tokens.startCall);
+      if (!scan(tokens.startCall)) {
+        error('Missing (');
+      }
+
       orientation = matchOrientation();
-      scan(tokens.comma);
+      if (orientation) {
+        if (!scan(tokens.comma)) {
+          error('Missing comma before color stops');
+        }
+      }
+
       colorStops = matchColorStops();
-      scan(tokens.endCall);
+      if (!colorStops.length) {
+        error('Missing color definitions');
+      }
+
+      if (!scan(tokens.endCall)) {
+        error('Missing )');
+      }
 
       return {
         type: 'linear-gradient',
@@ -93,10 +106,10 @@ module.exports = (function() {
   }
 
   function matchOrientation() {
-    return sideOrCorner();
+    return matchSideOrCorner();
   }
 
-  function sideOrCorner() {
+  function matchSideOrCorner() {
     var captures = scan(tokens.sideOrCorner);
     if (captures) {
       return {
@@ -107,23 +120,38 @@ module.exports = (function() {
   }
 
   function matchColorStops() {
-    var literalColors = /^([a-zA-Z]+)/,
-      captures = scan(literalColors),
+    var color = matchColorStop(),
       colors = [];
 
-    if (captures) {
-      colors.push(captures[0].toLowerCase());
+    if (color) {
+      colors.push(color);
       while (scan(tokens.comma)) {
-        captures = scan(literalColors);
-        if (captures) {
-          colors.push(captures[0].toLowerCase());
+        color = matchColorStop();
+        if (color) {
+          colors.push(color);
         } else {
-          // trow error
+          error('One extra comma');
         }
       }
     }
 
     return colors;
+  }
+
+  function matchColorStop() {
+    return matchLiteralColor();
+  }
+
+  function matchLiteralColor() {
+    var literalColors = /^([a-zA-Z]+)/,
+      captures = scan(literalColors);
+
+    if (captures) {
+      return {
+        type: 'literal',
+        value: captures[0].toLowerCase()
+      };
+    }
   }
 
   function scan(regexp) {
