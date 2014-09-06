@@ -29,6 +29,7 @@ module.exports = (function() {
     pixelValue: /^([0-9]+)px/,
     percentageValue: /^([0-9]+)\%/,
     emValue: /^([0-9]+)em/,
+    angleValue: /^([0-9]+)deg/,
     startCall: /^\(/,
     endCall: /^\)/,
     comma: /^,/
@@ -116,7 +117,8 @@ module.exports = (function() {
   }
 
   function matchOrientation() {
-    return matchSideOrCorner();
+    return matchSideOrCorner() ||
+      matchAngle();
   }
 
   function matchSideOrCorner() {
@@ -125,6 +127,16 @@ module.exports = (function() {
       return {
         type: 'directional',
         value: captures[1].toLowerCase()
+      };
+    }
+  }
+
+  function matchAngle() {
+    var captures = scan(tokens.angleValue);
+    if (captures) {
+      return {
+        type: 'angle',
+        value: captures[1]
       };
     }
   }

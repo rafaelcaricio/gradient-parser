@@ -151,4 +151,21 @@ describe('gradient-parser.js', function () {
       });
     });
   });
+
+  [
+    {type: 'angle', unparsedValue: '145deg', value: '145'},
+    {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
+  ].forEach(function(orientation) {
+    describe('parse orientation ' + orientation.type, function() {
+      beforeEach(function() {
+        ast = gradientParser('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
+        subject = ast[0];
+      });
+
+      it('should parse the ' + orientation.type + ' orientation', function() {
+        expect(subject.orientation.type).to.equal(orientation.type);
+        expect(subject.orientation.value).to.equal(orientation.value);
+      });
+    });
+  });
 });
