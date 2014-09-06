@@ -132,59 +132,87 @@ describe('gradient-parser.js', function () {
     });
   });
 
-  ['px', 'em', '%'].forEach(function(metric) {
-    describe('parse color stop for metric '+ metric, function() {
-      beforeEach(function() {
-        ast = gradients.parse('linear-gradient(blue 10' + metric + ', transparent)');
-        subject = ast[0];
-      });
-
-      describe('the first color', function() {
+  describe('parse all metric values', function() {
+    [
+      'px',
+      'em',
+      '%'
+    ].forEach(function(metric) {
+      describe('parse color stop for metric '+ metric, function() {
         beforeEach(function() {
-          subject = subject.colorStops[0];
+          ast = gradients.parse('linear-gradient(blue 10' + metric + ', transparent)');
+          subject = ast[0];
         });
 
-        it('should have the length', function() {
-          expect(subject.length.type).to.equal(metric);
-          expect(subject.length.value).to.equal('10');
+        describe('the first color', function() {
+          beforeEach(function() {
+            subject = subject.colorStops[0];
+          });
+
+          it('should have the length', function() {
+            expect(subject.length.type).to.equal(metric);
+            expect(subject.length.value).to.equal('10');
+          });
         });
       });
     });
   });
 
-  [
-    {type: 'angular', unparsedValue: '145deg', value: '145'},
-    {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
-  ].forEach(function(orientation) {
-    describe('parse orientation ' + orientation.type, function() {
-      beforeEach(function() {
-        ast = gradients.parse('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
-        subject = ast[0].orientation;
-      });
-
-      it('should parse value', function() {
-        expect(subject.type).to.equal(orientation.type);
-        expect(subject.value).to.equal(orientation.value);
-      });
-    });
-  });
-
-  [
-    {type: 'literal', unparsedValue: 'red', value: 'red'},
-    {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
-    {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
-    {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']}
-  ].forEach(function(color) {
-    describe('parse color type '+ color.type, function() {
-      beforeEach(function() {
-          ast = gradients.parse('linear-gradient(12deg, ' + color.unparsedValue + ', blue, green)');
-          subject = ast[0].colorStops[0];
+  describe('parse all linear directional', function() {
+    [
+      {type: 'angular', unparsedValue: '145deg', value: '145'},
+      {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
+    ].forEach(function(orientation) {
+      describe('parse orientation ' + orientation.type, function() {
+        beforeEach(function() {
+          ast = gradients.parse('linear-gradient(' + orientation.unparsedValue + ', blue, green)');
+          subject = ast[0].orientation;
         });
 
         it('should parse value', function() {
-          expect(subject.type).to.equal(color.type);
-          expect(subject.value).to.eql(color.value);
+          expect(subject.type).to.equal(orientation.type);
+          expect(subject.value).to.equal(orientation.value);
         });
+      });
+    });
+  });
+
+  describe('parse all color types', function() {
+    [
+      {type: 'literal', unparsedValue: 'red', value: 'red'},
+      {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
+      {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
+      {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']}
+    ].forEach(function(color) {
+      describe('parse color type '+ color.type, function() {
+        beforeEach(function() {
+            ast = gradients.parse('linear-gradient(12deg, ' + color.unparsedValue + ', blue, green)');
+            subject = ast[0].colorStops[0];
+          });
+
+          it('should parse value', function() {
+            expect(subject.type).to.equal(color.type);
+            expect(subject.value).to.eql(color.value);
+          });
+      });
+    });
+  });
+
+  describe('parse linear gradients', function() {
+    [
+      'linear-gradient',
+      'repeating-linear-gradient'
+    ].forEach(function(gradient) {
+      describe('parse ' + gradient + ' gradient', function() {
+        beforeEach(function() {
+          ast = gradients.parse(gradient + '(red, blue)');
+          subject = ast[0];
+        });
+
+        it('should parse the gradient', function() {
+          expect(subject.type).to.equal(gradient);
+        });
+      });
     });
   });
 });
