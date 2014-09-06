@@ -40,13 +40,10 @@ module.exports = (function() {
     number: /^(([0-9]*\.[0-9]+)|([0-9]+\.?))/
   };
 
-  var input = '',
-    cursor = 0;
+  var input = '';
 
   function error(msg) {
-    var err = new Error(input + ':' + cursor + ': ' + msg);
-    err.position = cursor;
-    //err.message = msg;
+    var err = new Error(input + ': ' + msg);
     err.source = input;
     throw err;
   }
@@ -265,7 +262,6 @@ module.exports = (function() {
   }
 
   function consume(size) {
-    cursor += size;
     input = input.substr(size);
   }
 
