@@ -71,26 +71,24 @@ module.exports = (function() {
 
   function matchGradient(gradientType, pattern, orientationMatcher) {
     return matchCall(pattern, function(captures) {
-      orientation = orientationMatcher();
+
+      var orientation = orientationMatcher();
       if (orientation) {
         if (!scan(tokens.comma)) {
           error('Missing comma before color stops');
         }
       }
 
-      colorStops = matchListing(matchColorStop);
       return {
         type: gradientType,
         orientation: orientation,
-        colorStops: colorStops
+        colorStops: matchListing(matchColorStop)
       };
     });
   }
 
   function matchCall(pattern, callback) {
-    var captures = scan(pattern),
-      orientation,
-      colorStops;
+    var captures = scan(pattern);
 
     if (captures) {
       if (!scan(tokens.startCall)) {
