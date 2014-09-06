@@ -1,4 +1,4 @@
-# gradient-parser
+# Gradient Parser
 
 ## About
 
@@ -9,7 +9,33 @@ Parse CSS3 gradient definition and returns AST.
 ### JavaScript
 
 ```JavaScript
-  // TODO
+  var gradient = require('gradient-parser');
+  var obj = gradient.parse('linear-gradient(30deg, #000, transparent)');
+  console.log(JSON.stringify(obj, null, 2));
+```
+
+Results in:
+
+```JSON
+[
+  {
+    "type": "linear-gradient",
+    "orientation": {
+      "type": "angular",
+      "value": "30"
+    },
+    "colorStops": [
+      {
+        "type": "hex",
+        "value": "000"
+      },
+      {
+        "type": "literal",
+        "value": "transparent"
+      }
+    ]
+  }
+]
 ```
 
 ## Install Choices

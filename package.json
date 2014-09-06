@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git://github.com/rafaelcaricio/gradient-parser.git"
   },
-  "main": "gradient-parser.js",
+  "main": "index.js",
   "scripts": {
     "test": "grunt"
   },
