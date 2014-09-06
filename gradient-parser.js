@@ -34,7 +34,10 @@ module.exports = (function() {
     endCall: /^\)/,
     comma: /^,/,
     hexColor: /^\#([0-9a-fA-F]+)/,
-    literalColor: /^([a-zA-Z]+)/
+    literalColor: /^([a-zA-Z]+)/,
+    rgbColor: /^rgb/i,
+    rgbaColor: /^rgba/i,
+    number: /^(([0-9]*\.[0-9]+)|([0-9]+\.?))/
   };
 
   var input = '',
@@ -85,6 +88,24 @@ module.exports = (function() {
   }
 
   function matchGradient(gradientType, pattern, orientationMatcher) {
+    return matchCall(pattern, function(captures) {
+      orientation = orientationMatcher();
+      if (orientation) {
+        if (!scan(tokens.comma)) {
+          error('Missing comma before color stops');
+        }
+      }
+
+      colorStops = matchListing(matchColorStop);
+      return {
+        type: gradientType,
+        orientation: orientation,
+        colorStops: colorStops
+      };
+    });
+  }
+
+  function matchCall(pattern, callback) {
     var captures = scan(pattern),
       orientation,
       colorStops;
@@ -94,27 +115,13 @@ module.exports = (function() {
         error('Missing (');
       }
 
-      orientation = orientationMatcher();
-      if (orientation) {
-        if (!scan(tokens.comma)) {
-          error('Missing comma before color stops');
-        }
-      }
-
-      colorStops = matchColorStops();
-      if (!colorStops.length) {
-        error('Missing color definitions');
-      }
+      result = callback(captures);
 
       if (!scan(tokens.endCall)) {
         error('Missing )');
       }
 
-      return {
-        type: gradientType,
-        orientation: orientation,
-        colorStops: colorStops
-      };
+      return result;
     }
   }
 
@@ -143,23 +150,23 @@ module.exports = (function() {
     }
   }
 
-  function matchColorStops() {
-    var color = matchColorStop(),
-      colors = [];
+  function matchListing(matcher) {
+    var captures = matcher(),
+      result = [];
 
-    if (color) {
-      colors.push(color);
+    if (captures) {
+      result.push(captures);
       while (scan(tokens.comma)) {
-        color = matchColorStop();
-        if (color) {
-          colors.push(color);
+        captures = matcher();
+        if (captures) {
+          result.push(captures);
         } else {
           error('One extra comma');
         }
       }
     }
 
-    return colors;
+    return result;
   }
 
   function matchColorStop() {
@@ -174,8 +181,10 @@ module.exports = (function() {
   }
 
   function matchColor() {
-    return matchLiteralColor() ||
-      matchHexColor();
+    return matchHexColor() ||
+      matchRGBAColor() ||
+      matchRGBColor() ||
+      matchLiteralColor();
   }
 
   function matchLiteralColor() {
@@ -198,6 +207,28 @@ module.exports = (function() {
         value: captures[1]
       };
     }
+  }
+
+  function matchRGBColor() {
+    return matchCall(tokens.rgbColor, function() {
+      return  {
+        type: 'rgb',
+        value: matchListing(matchNumber)
+      };
+    });
+  }
+
+  function matchRGBAColor() {
+    return matchCall(tokens.rgbaColor, function() {
+      return  {
+        type: 'rgba',
+        value: matchListing(matchNumber)
+      };
+    });
+  }
+
+  function matchNumber() {
+    return scan(tokens.number)[1];
   }
 
   function matchLength() {

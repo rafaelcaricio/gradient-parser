@@ -171,7 +171,9 @@ describe('gradient-parser.js', function () {
 
   [
     {type: 'literal', unparsedValue: 'red', value: 'red'},
-    {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'}
+    {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
+    {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
+    {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']}
   ].forEach(function(color) {
     describe('parse color type '+ color.type, function() {
       beforeEach(function() {
@@ -181,7 +183,7 @@ describe('gradient-parser.js', function () {
 
         it('should parse value', function() {
           expect(subject.type).to.equal(color.type);
-          expect(subject.value).to.equal(color.value);
+          expect(subject.value).to.eql(color.value);
         });
     });
   });
