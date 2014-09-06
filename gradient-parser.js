@@ -59,22 +59,7 @@ module.exports = (function() {
   }
 
   function matchListDefinitions() {
-    var definitions = [],
-      currentDefinition = matchDefinition();
-
-    if (currentDefinition) {
-      definitions.push(currentDefinition);
-      while (scan(tokens.comma)) {
-        currentDefinition = matchDefinition();
-        if (currentDefinition) {
-          definitions.push(currentDefinition);
-        } else {
-          error('One extra comma');
-        }
-      }
-    }
-
-    return definitions;
+    return matchListing(matchDefinition);
   }
 
   function matchDefinition() {
