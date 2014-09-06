@@ -2,11 +2,9 @@
 
 ## About
 
-Parse CSS3 gradient definition and returns AST.
+Parse CSS3 gradient definition and returns AST `object`.
 
 ## Examples
-
-### JavaScript
 
 ```JavaScript
   var gradient = require('gradient-parser');
