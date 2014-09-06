@@ -201,7 +201,9 @@ describe('gradient-parser.js', function () {
   describe('parse linear gradients', function() {
     [
       'linear-gradient',
-      'repeating-linear-gradient'
+      'radial-gradient',
+      'repeating-linear-gradient',
+      'repeating-radial-gradient'
     ].forEach(function(gradient) {
       describe('parse ' + gradient + ' gradient', function() {
         beforeEach(function() {
@@ -215,4 +217,5 @@ describe('gradient-parser.js', function () {
       });
     });
   });
+
 });
