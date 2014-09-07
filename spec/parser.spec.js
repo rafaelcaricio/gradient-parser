@@ -218,4 +218,20 @@ describe('gradient-parser.js', function () {
     });
   });
 
+  describe('different radial declarations', function() {
+    [
+      'ellipse farthest-corner',
+      'ellipse cover',
+      'circle cover',
+      'center bottom, ellipse cover',
+      'circle at 119px 58px'
+    ].forEach(function(declaration) {
+
+      it('should parse ' + declaration + ' declaration', function() {
+        ast = gradients.parse('radial-gradient(' + declaration + ', red, blue)');
+      });
+
+    });
+  });
+
 });
