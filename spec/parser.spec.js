@@ -113,7 +113,7 @@ describe('gradient-parser.js', function () {
     ].forEach(function(metric) {
       describe('parse color stop for metric '+ metric, function() {
         beforeEach(function() {
-          ast = gradients.parse('linear-gradient(blue 10' + metric + ', transparent)');
+          ast = gradients.parse('linear-gradient(blue 10.3' + metric + ', transparent)');
           subject = ast[0];
         });
 
@@ -124,7 +124,7 @@ describe('gradient-parser.js', function () {
 
           it('should have the length', function() {
             expect(subject.length.type).to.equal(metric);
-            expect(subject.length.value).to.equal('10');
+            expect(subject.length.value).to.equal('10.3');
           });
         });
       });
@@ -133,7 +133,7 @@ describe('gradient-parser.js', function () {
 
   describe('parse all linear directional', function() {
     [
-      {type: 'angular', unparsedValue: '145deg', value: '145'},
+      {type: 'angular', unparsedValue: '-145deg', value: '-145'},
       {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
     ].forEach(function(orientation) {
       describe('parse orientation ' + orientation.type, function() {
