@@ -40,6 +40,12 @@ Results in:
 - `bower install gradient-parser`
 - [download the zip](https://github.com/rafaelcaricio/gradient-parser/archive/master.zip)
 
+## API
+
+# gradient.parse
+
+Accepts the gradient definitions as it is declared in the `background-image` and returns an AST `object`.
+
 ## License
 
 (The MIT License)
