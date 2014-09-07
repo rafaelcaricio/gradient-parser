@@ -82,7 +82,7 @@ The available values of `node.type` are listed below, as well as the available p
 
 ### directional
 
-- value: `String` possible values `left`, `top`, `bottom`, `right`.
+- value: `String` possible values `left`, `top`, `bottom`, or `right`.
 
 ### angular
 
@@ -109,14 +109,22 @@ The available values of `node.type` are listed below, as well as the available p
 - style: `Object` or `undefined` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
 - value: `String` possible values `ellipse` or `circle`.
 - at: `Object` of attributes:
-	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
-	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
+	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
+	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
 
 ### default-radial
 
 - at: `Object` of attributes:
-	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
-	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
+	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
+	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
+
+### positioning-keyword
+
+- value: `String` possible values `center`, `left`, `top`, `bottom`, or `right`.
+
+### extent-keyword
+
+- value: `String` possible values `closest-side`, `closest-corner`, `farthest-side`, `farthest-corner`, `contain`, or `cover`.
 
 ## License
 
