@@ -108,6 +108,9 @@ The available values of `node.type` are listed below, as well as the available p
 
 - style: `Object` or `undefined` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
 - value: `String` possible values `ellipse` or `circle`.
+- at: `Object` of attributes:
+	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
+	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
 
 ### default-radial
 
