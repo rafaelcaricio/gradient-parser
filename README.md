@@ -44,7 +44,31 @@ Results in:
 
 ### gradient.parse
 
-Accepts the gradient definitions as it is declared in the `background-image` and returns an AST `object`.
+Accepts the gradient definitions as it is declared in `background-image` and returns an AST `object`.
+
+## AST
+
+### Common properties
+
+All nodes have the following properties.
+
+#### type
+
+`String`. The possible values are the ones listed in the Types section bellow.
+
+### Types
+
+The available values of `node.type` are listed below, as well as the available properties of each node (other than the common properties listed above).
+
+### linear-gradient
+
+- orientation: `Object` possible types `directional` or `angular`.
+- colorStops: `Array` of color stops of type `literal`, `hex`, `rgb`, or `rgba`.
+
+### repeating-linear-gradient
+
+- orientation: `Object` possible types `directional` or `angular`.
+- colorStops: `Array` of color stops of type `literal`, `hex`, `rgb`, or `rgba`.
 
 ## License
 
