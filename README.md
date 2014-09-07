@@ -42,7 +42,7 @@ Results in:
 
 ## API
 
-# gradient.parse
+### gradient.parse
 
 Accepts the gradient definitions as it is declared in the `background-image` and returns an AST `object`.
 
