@@ -335,3 +335,5 @@ GradientParser.parse = (function() {
     return getAST();
   };
 })();
+
+exports.parse = (GradientParser || {}).parse;

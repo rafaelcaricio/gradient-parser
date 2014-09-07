@@ -1,1 +1,1 @@
-exports.parse = require('./lib/parser');
+exports.parse = (GradientParser || {}).parse;

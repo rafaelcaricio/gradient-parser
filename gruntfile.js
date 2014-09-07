@@ -15,12 +15,22 @@ module.exports = function (grunt) {
         },
         src: ['spec/**/*.js']
       }
+    },
+    concat: {
+      release: {
+        files: {
+          'build/node.js': ['lib/parser.js', 'index.js'],
+          'build/web.js': ['lib/parser.js']
+        }
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   grunt.registerTask('default', [
+    'concat',
     'mochaTest'
   ]);
 };

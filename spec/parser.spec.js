@@ -1,35 +1,8 @@
 'use strict';
 
 var expect = require('expect.js');
-var gradients = require('index');
+var gradients = require('build/node');
 
-// [
-//   {
-//     type: 'linear-gradient',
-//     orientation: {
-//       type: 'directional',
-//       value: 'right'
-//     },
-//     colorStops: [
-//       {
-//         type: 'literal',
-//         value: 'transparent',
-//         length: {
-//           value: '10',
-//           type: 'px'
-//         }
-//       },
-//       {
-//         type: 'hex',
-//         value: 'c2c2c2',
-//         length: {
-//           value: '10',
-//           type: 'px'
-//         }
-//       }
-//     ]
-//   }
-// ]
 
 describe('gradient-parser.js', function () {
   var ast,
