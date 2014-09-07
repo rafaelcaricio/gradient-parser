@@ -70,6 +70,51 @@ The available values of `node.type` are listed below, as well as the available p
 - orientation: `Object` possible types `directional` or `angular`.
 - colorStops: `Array` of color stops of type `literal`, `hex`, `rgb`, or `rgba`.
 
+### radial-gradient
+
+- orientation: `Array` or `undefined`. `Array` of possible types `shape`, `default-radial`.
+- colorStops: `Array` of color stops of type `literal`, `hex`, `rgb`, or `rgba`.
+
+### repeating-radial-gradient
+
+- orientation: `Array` or `undefined`. `Array` of possible types `shape`, `default-radial`.
+- colorStops: `Array` of color stops of type `literal`, `hex`, `rgb`, or `rgba`.
+
+### directional
+
+- value: `String` possible values `left`, `top`, `bottom`, `right`.
+
+### angular
+
+- value: `Number` integer number.
+
+### literal
+
+- value: `String` literal name of the color.
+
+### hex
+
+- value: `String` hex value.
+
+### rgb
+
+- value: `Array` of length 3 of `Number`'s.
+
+### rgba
+
+- value: `Array` of length 4 or `Number`'s.
+
+### shape
+
+- style: `Object` or `undefined` possible types `extent-keyword`, `px`, `em`, `%`, or `positioning-keyword`.
+- value: `String` possible values `ellipse` or `circle`.
+
+### default-radial
+
+- at: `Object` of attributes:
+	- x: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
+	- y: `Object` possible types `extent-keyword`, `px`, `em`, `%`, or `positioningKeyword`.
+
 ## License
 
 (The MIT License)
