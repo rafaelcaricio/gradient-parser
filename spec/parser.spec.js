@@ -15,13 +15,13 @@ describe('gradient-parser.js', function () {
   describe('error cases', function() {
     it('one more comma in definitions', function() {
       expect(function() {
-        gradients.parse('linear-gradient(red, blue),');
+        gradients.parse('-webkit-linear-gradient(red, blue),');
       }).to.throwException(/One extra comma/);
     });
 
     it('one more comma in colors', function() {
       expect(function() {
-        gradients.parse('linear-gradient(red, blue,)');
+        gradients.parse('-o-linear-gradient(red, blue,)');
       }).to.throwException(/Expected color definition/);
     });
 

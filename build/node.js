@@ -7,10 +7,10 @@ var GradientParser = {};
 GradientParser.parse = (function() {
 
   var tokens = {
-    linearGradient: /^linear\-gradient/i,
-    repeatingLinearGradient: /^repeating\-linear\-gradient/i,
-    radialGradient: /^radial\-gradient/i,
-    repeatingRadialGradient: /^repeating\-radial\-gradient/i,
+    linearGradient: /^(\-(webkit|o|ms|moz)\-)?(linear\-gradient)/i,
+    repeatingLinearGradient: /^(\-(webkit|o|ms|moz)\-)?(repeating\-linear\-gradient)/i,
+    radialGradient: /^(\-(webkit|o|ms|moz)\-)?(radial\-gradient)/i,
+    repeatingRadialGradient: /^(\-(webkit|o|ms|moz)\-)?(repeating\-radial\-gradient)/i,
     sideOrCorner: /^to (left (top|bottom)|right (top|bottom)|left|right|top|bottom)/i,
     extentKeywords: /^(closest\-side|closest\-corner|farthest\-side|farthest\-corner|contain|cover)/,
     positionKeywords: /^(left|center|right|top|bottom)/i,
