@@ -1,6 +1,6 @@
 {
   "name": "gradient-parser",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Parse CSS3 gradient definitions and return an AST.",
   "author": {
     "name": "Rafael Carcicio",
