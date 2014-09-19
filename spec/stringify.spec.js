@@ -21,6 +21,31 @@ describe('lib/stringify.js', function () {
       expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
     });
 
+    it('should serialize gradient with hex', function() {
+      var gradientDef = 'linear-gradient(#fff, white)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
+    it('should serialize gradient with rgb', function() {
+      var gradientDef = 'linear-gradient(rgb(1, 2, 3), white)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
+    it('should serialize gradient with rgba', function() {
+      var gradientDef = 'linear-gradient(rgba(1, 2, 3, .0), white)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
+    it('should serialize gradient with deg', function() {
+      var gradientDef = 'linear-gradient(45deg, #fff, transparent)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
+    it('should serialize gradient with directional', function() {
+      var gradientDef = 'linear-gradient(to left, #fff, transparent)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
   });
 
 });
