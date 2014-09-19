@@ -4,7 +4,7 @@ var expect = require('expect.js');
 var gradients = require('build/node');
 
 
-describe('gradient-parser.js', function () {
+describe('lib/parser.js', function () {
   var ast,
     subject;
 

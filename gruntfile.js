@@ -19,8 +19,8 @@ module.exports = function (grunt) {
     concat: {
       release: {
         files: {
-          'build/node.js': ['lib/parser.js', 'index.js'],
-          'build/web.js': ['lib/parser.js']
+          'build/node.js': ['lib/stringify.js', 'lib/parser.js', 'index.js'],
+          'build/web.js': ['webify.js', 'lib/parser.js', 'lib/stringify.js']
         }
       }
     }
