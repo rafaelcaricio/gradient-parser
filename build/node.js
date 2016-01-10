@@ -60,7 +60,14 @@ GradientParser.stringify = (function() {
     },
 
     'visit_extent-keyword': function(node) {
-      return node.value;
+      var result = node.value,
+          at = visitor.visit(node.at);
+
+      if (at) {
+        result += ' at ' + at;
+      }
+
+      return result;
     },
 
     'visit_position-keyword': function(node) {
@@ -310,12 +317,21 @@ GradientParser.parse = (function() {
     if (radialType) {
       radialType.at = matchAtPosition();
     } else {
-      var defaultPosition = matchPositioning();
-      if (defaultPosition) {
-        radialType = {
-          type: 'default-radial',
-          at: defaultPosition
-        };
+      var extent = matchExtentKeyword();
+      if (extent) {
+        radialType = extent;
+        var positionAt = matchAtPosition();
+        if (positionAt) {
+          radialType.at = positionAt;
+        }
+      } else {
+        var defaultPosition = matchPositioning();
+        if (defaultPosition) {
+          radialType = {
+            type: 'default-radial',
+            at: defaultPosition
+          };
+        }
       }
     }
 
