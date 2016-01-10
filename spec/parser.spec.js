@@ -197,7 +197,10 @@ describe('lib/parser.js', function () {
       'ellipse cover',
       'circle cover',
       'center bottom, ellipse cover',
-      'circle at 87.23px -58.3px'
+      'circle at 87.23px -58.3px',
+      'farthest-side, red, blue',
+      'farthest-corner, red, blue',
+      'farthest-corner at 87.23px -58.3px, red, blue'
     ].forEach(function(declaration) {
 
       it('should parse ' + declaration + ' declaration', function() {
