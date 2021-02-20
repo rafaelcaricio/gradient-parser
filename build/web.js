@@ -100,7 +100,7 @@ GradientParser.parse = (function() {
         error('Missing (');
       }
 
-      result = callback(captures);
+      var result = callback(captures);
 
       if (!scan(tokens.endCall)) {
         error('Missing )');
