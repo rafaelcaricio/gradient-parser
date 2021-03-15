@@ -32,8 +32,8 @@
     "css3",
     "parser"
   ],
-  "dependencies": {},
   "devDependencies": {
+    "expect.js": "*",
     "grunt": "*",
     "grunt-browserify": "^3.0.1",
     "grunt-complexity": "*",

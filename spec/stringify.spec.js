@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('expect.js');
-var gradients = require('build/node');
+var gradients = require('../build/node');
 
 function pprint(ast) {
   console.log(JSON.stringify(ast, true, 2));

@@ -491,6 +491,7 @@ GradientParser.stringify = (function() {
       if (!element) {
         return '';
       }
+      var result = '';
 
       if (element instanceof Array) {
         return visitor.visit_array(element, result);
