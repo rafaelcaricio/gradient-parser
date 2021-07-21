@@ -134,7 +134,11 @@ describe('lib/parser.js', function () {
   describe('parse all linear directional', function() {
     [
       {type: 'angular', unparsedValue: '-145deg', value: '-145'},
-      {type: 'directional', unparsedValue: 'to left top', value: 'left top'}
+      {type: 'directional', unparsedValue: 'to left top', value: 'left top'},
+      {type: 'directional', unparsedValue: 'to top left', value: 'top left'},
+      {type: 'directional', unparsedValue: 'to top right', value: 'top right'},
+      {type: 'directional', unparsedValue: 'to bottom left', value: 'bottom left'},
+      {type: 'directional', unparsedValue: 'to bottom right', value: 'bottom right'}
     ].forEach(function(orientation) {
       describe('parse orientation ' + orientation.type, function() {
         beforeEach(function() {
