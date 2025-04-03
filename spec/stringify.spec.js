@@ -30,6 +30,11 @@ describe('lib/stringify.js', function () {
       expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
     });
 
+    it('should serialize gradient with var', function() {
+      var gradientDef = 'linear-gradient(var(--color-black), white)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
     it('should serialize gradient with rgb', function() {
       var gradientDef = 'linear-gradient(rgb(1, 2, 3), white)';
       expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
