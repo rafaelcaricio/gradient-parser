@@ -214,6 +214,66 @@ describe('lib/parser.js', function () {
       });
 
     });
+    
+    it('should parse ellipse with dimensions and position', function() {
+      const gradient = 'repeating-radial-gradient(ellipse 40px 134px at 50% 96%, rgb(0, 165, 223) 0%, rgb(62, 20, 123) 6.6%)';
+      const ast = gradients.parse(gradient);
+      
+      expect(ast[0].type).to.equal('repeating-radial-gradient');
+      expect(ast[0].orientation[0].type).to.equal('shape');
+      expect(ast[0].orientation[0].value).to.equal('ellipse');
+      
+      // Check the style (size dimensions)
+      expect(ast[0].orientation[0].style.type).to.equal('position');
+      expect(ast[0].orientation[0].style.value.x.type).to.equal('px');
+      expect(ast[0].orientation[0].style.value.x.value).to.equal('40');
+      expect(ast[0].orientation[0].style.value.y.type).to.equal('px');
+      expect(ast[0].orientation[0].style.value.y.value).to.equal('134');
+      
+      // Check the position
+      expect(ast[0].orientation[0].at.type).to.equal('position');
+      expect(ast[0].orientation[0].at.value.x.type).to.equal('%');
+      expect(ast[0].orientation[0].at.value.x.value).to.equal('50');
+      expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
+      expect(ast[0].orientation[0].at.value.y.value).to.equal('96');
+      
+      // Check the color stops
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['0', '165', '223']);
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length.value).to.equal('0');
+      
+      expect(ast[0].colorStops[1].type).to.equal('rgb');
+      expect(ast[0].colorStops[1].value).to.eql(['62', '20', '123']);
+      expect(ast[0].colorStops[1].length.type).to.equal('%');
+      expect(ast[0].colorStops[1].length.value).to.equal('6.6');
+    });
+    
+    it('should parse full Pride flag gradient', function() {
+      const gradient = 'repeating-radial-gradient(ellipse 40px 134px at 50% 96%,rgb(0, 165, 223) 0%,rgb(62, 20, 123) 6.6%,rgb(226, 0, 121) 13.2%,rgb(223, 19, 44) 18.8%,rgb(243, 239, 21) 24.1%,rgb(0, 152, 71) 33.3%)';
+      const ast = gradients.parse(gradient);
+      
+      expect(ast[0].type).to.equal('repeating-radial-gradient');
+      expect(ast[0].orientation[0].type).to.equal('shape');
+      expect(ast[0].orientation[0].value).to.equal('ellipse');
+      
+      // Check dimensions and position
+      expect(ast[0].orientation[0].style.type).to.equal('position');
+      expect(ast[0].orientation[0].at.type).to.equal('position');
+      
+      // Verify all color stops are present (Pride flag colors)
+      expect(ast[0].colorStops).to.have.length(6);
+      
+      // Check the first and last color stops
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['0', '165', '223']);
+      
+      expect(ast[0].colorStops[5].type).to.equal('rgb');
+      expect(ast[0].colorStops[5].value).to.eql(['0', '152', '71']);
+      expect(ast[0].colorStops[5].length.type).to.equal('%');
+      expect(ast[0].colorStops[5].length.value).to.equal('33.3');
+    });
   });
 
   describe('parse gradient strings with trailing semicolons', function() {
