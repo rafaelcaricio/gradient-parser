@@ -139,7 +139,9 @@ describe('lib/parser.js', function () {
       {type: 'directional', unparsedValue: 'to top left', value: 'top left'},
       {type: 'directional', unparsedValue: 'to top right', value: 'top right'},
       {type: 'directional', unparsedValue: 'to bottom left', value: 'bottom left'},
-      {type: 'directional', unparsedValue: 'to bottom right', value: 'bottom right'}
+      {type: 'directional', unparsedValue: 'to bottom right', value: 'bottom right'},
+      {type: 'directional', unparsedValue: 'to bottom', value: 'bottom'}, // Test modern syntax
+      {type: 'directional', unparsedValue: 'bottom', value: 'bottom'} // Test legacy syntax
     ].forEach(function(orientation) {
       describe('parse orientation ' + orientation.type, function() {
         beforeEach(function() {
@@ -193,6 +195,21 @@ describe('lib/parser.js', function () {
       expect(subject.colorStops[1].value).to.equal('0000ff');
     });
     
+    it('should correctly parse "to bottom" direction (modern syntax)', function() {
+      const parsed = gradients.parse('linear-gradient(to bottom, rgb(0, 91, 154), rgb(230, 193, 61))');
+      let subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('bottom');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('rgb');
+      expect(subject.colorStops[0].value).to.eql(['0', '91', '154']);
+      expect(subject.colorStops[1].type).to.equal('rgb');
+      expect(subject.colorStops[1].value).to.eql(['230', '193', '61']);
+    });
+
     it('should correctly parse legacy syntax with "left" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(left, rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.8))');
       let subject = parsed[0];
