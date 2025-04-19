@@ -216,4 +216,39 @@ describe('lib/parser.js', function () {
     });
   });
 
+  describe('parse gradient strings with trailing semicolons', function() {
+    it('should parse linear-gradient with trailing semicolon', function() {
+      const inputWithSemicolon = 'linear-gradient(red, blue);';
+      const ast = gradients.parse(inputWithSemicolon);
+      expect(ast[0].type).to.equal('linear-gradient');
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].value).to.equal('red');
+      expect(ast[0].colorStops[1].value).to.equal('blue');
+    });
+
+    it('should parse radial-gradient with trailing semicolon', function() {
+      const inputWithSemicolon = 'radial-gradient(circle, red, blue);';
+      const ast = gradients.parse(inputWithSemicolon);
+      expect(ast[0].type).to.equal('radial-gradient');
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].value).to.equal('red');
+      expect(ast[0].colorStops[1].value).to.equal('blue');
+    });
+
+    it('should parse complex gradient with trailing semicolon', function() {
+      const inputWithSemicolon = 'linear-gradient(to right, rgb(22, 234, 174) 0%, rgb(126, 32, 207) 100%);';
+      const ast = gradients.parse(inputWithSemicolon);
+      expect(ast[0].type).to.equal('linear-gradient');
+      expect(ast[0].orientation.type).to.equal('directional');
+      expect(ast[0].orientation.value).to.equal('right');
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length.value).to.equal('0');
+      expect(ast[0].colorStops[1].type).to.equal('rgb');
+      expect(ast[0].colorStops[1].length.type).to.equal('%');
+      expect(ast[0].colorStops[1].length.value).to.equal('100');
+    });
+  });
+
 });
