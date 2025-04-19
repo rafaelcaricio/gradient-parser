@@ -142,6 +142,13 @@ GradientParser.stringify = (function() {
       return result;
     },
 
+    'visit_object': function(obj) {
+      if (obj.width && obj.height) {
+        return visitor.visit(obj.width) + ' ' + visitor.visit(obj.height);
+      }
+      return '';
+    },
+
     'visit': function(element) {
       if (!element) {
         return '';
@@ -150,6 +157,8 @@ GradientParser.stringify = (function() {
 
       if (element instanceof Array) {
         return visitor.visit_array(element, result);
+      } else if (typeof element === 'object' && !element.type) {
+        return visitor.visit_object(element);
       } else if (element.type) {
         var nodeVisitor = visitor['visit_' + element.type];
         if (nodeVisitor) {
@@ -361,7 +370,7 @@ GradientParser.parse = (function() {
     var ellipse = match('shape', /^(ellipse)/i, 0);
 
     if (ellipse) {
-      ellipse.style =  matchDistance() || matchExtentKeyword();
+      ellipse.style = matchPositioning() || matchDistance() || matchExtentKeyword();
     }
 
     return ellipse;
@@ -529,7 +538,11 @@ GradientParser.parse = (function() {
   }
 
   return function(code) {
-    input = code.toString();
+    input = code.toString().trim();
+    // Remove trailing semicolon if present
+    if (input.endsWith(';')) {
+      input = input.slice(0, -1);
+    }
     return getAST();
   };
 })();

@@ -311,4 +311,26 @@ describe('lib/parser.js', function () {
     });
   });
 
+  describe('parse gradient strings', function() {
+    it('should parse repeating linear gradient with bottom right direction', function() {
+      const gradient = 'repeating-linear-gradient(to bottom right,rgb(254, 158, 150) 0%,rgb(172, 79, 115) 100%)';
+      const ast = gradients.parse(gradient);
+      
+      expect(ast[0].type).to.equal('repeating-linear-gradient');
+      expect(ast[0].orientation.type).to.equal('directional');
+      expect(ast[0].orientation.value).to.equal('bottom right');
+      
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['254', '158', '150']);
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length.value).to.equal('0');
+      
+      expect(ast[0].colorStops[1].type).to.equal('rgb');
+      expect(ast[0].colorStops[1].value).to.eql(['172', '79', '115']);
+      expect(ast[0].colorStops[1].length.type).to.equal('%');
+      expect(ast[0].colorStops[1].length.value).to.equal('100');
+    });
+  });
+
 });
