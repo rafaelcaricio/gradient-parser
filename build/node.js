@@ -358,12 +358,21 @@ GradientParser.parse = (function() {
           radialType.at = positionAt;
         }
       } else {
-        var defaultPosition = matchPositioning();
-        if (defaultPosition) {
+        // Check for "at" position first, which is a common browser output format
+        var atPosition = matchAtPosition();
+        if (atPosition) {
           radialType = {
             type: 'default-radial',
-            at: defaultPosition
+            at: atPosition
           };
+        } else {
+          var defaultPosition = matchPositioning();
+          if (defaultPosition) {
+            radialType = {
+              type: 'default-radial',
+              at: defaultPosition
+            };
+          }
         }
       }
     }
