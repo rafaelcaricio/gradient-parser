@@ -107,13 +107,11 @@ GradientParser.stringify = (function() {
     },
 
     'visit_hsl': function(node) {
-      const [h, s, l] = node.value;
-      return visitor.visit_color(`hsl(${h}, ${s}%, ${l}%)`, node);
+      return visitor.visit_color('hsl(' + node.value[0] + ', ' + node.value[1] + '%, ' + node.value[2] + '%)', node);
     },
 
     'visit_hsla': function(node) {
-      const [h, s, l, a] = node.value;
-      return visitor.visit_color(`hsla(${h}, ${s}%, ${l}%, ${a})`, node);
+      return visitor.visit_color('hsla(' + node.value[0] + ', ' + node.value[1] + '%, ' + node.value[2] + '%, ' + node.value[3] + ')', node);
     },
 
     'visit_var': function(node) {
@@ -499,11 +497,22 @@ GradientParser.parse = (function() {
 
   function matchHSLColor() {
     return matchCall(tokens.hslColor, function() {
+      // Check for percentage before trying to parse the hue
+      var lookahead = scan(tokens.percentageValue);
+      if (lookahead) {
+        error('HSL hue value must be a number in degrees (0-360) or normalized (-360 to 360), not a percentage');
+      }
+      
       var hue = matchNumber();
       scan(tokens.comma);
-      var sat = matchPercentage();
+      var captures = scan(tokens.percentageValue);
+      var sat = captures ? captures[1] : null;
       scan(tokens.comma);
-      var light = matchPercentage();
+      captures = scan(tokens.percentageValue);
+      var light = captures ? captures[1] : null;
+      if (!sat || !light) {
+        error('Expected percentage value for saturation and lightness in HSL');
+      }
       return {
         type: 'hsl',
         value: [hue, sat, light]
@@ -515,11 +524,16 @@ GradientParser.parse = (function() {
     return matchCall(tokens.hslaColor, function() {
       var hue = matchNumber();
       scan(tokens.comma);
-      var sat = matchPercentage();
+      var captures = scan(tokens.percentageValue);
+      var sat = captures ? captures[1] : null;
       scan(tokens.comma);
-      var light = matchPercentage();
+      captures = scan(tokens.percentageValue);
+      var light = captures ? captures[1] : null;
       scan(tokens.comma);
       var alpha = matchNumber();
+      if (!sat || !light) {
+        error('Expected percentage value for saturation and lightness in HSLA');
+      }
       return {
         type: 'hsla',
         value: [hue, sat, light, alpha]
