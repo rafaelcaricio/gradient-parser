@@ -153,6 +153,75 @@ describe('lib/parser.js', function () {
         });
       });
     });
+    
+    it('should correctly parse directional value without "to" keyword (legacy syntax)', function() {
+      // This uses the legacy syntax without "to" keyword (e.g., "right" instead of "to right")
+      const parsed = gradients.parse('-webkit-linear-gradient(right, rgb(248, 6, 234) 71%, rgb(202, 74, 208) 78%)');
+      let subject = parsed[0];
+      
+      // It should properly identify the orientation as directional "right"
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('right');
+      
+      // And it should have only 2 color stops
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('rgb');
+      expect(subject.colorStops[0].value).to.eql(['248', '6', '234']);
+      expect(subject.colorStops[0].length.type).to.equal('%');
+      expect(subject.colorStops[0].length.value).to.equal('71');
+      
+      expect(subject.colorStops[1].type).to.equal('rgb');
+      expect(subject.colorStops[1].value).to.eql(['202', '74', '208']);
+      expect(subject.colorStops[1].length.type).to.equal('%');
+      expect(subject.colorStops[1].length.value).to.equal('78');
+    });
+    
+    // Additional test cases for other legacy directional keywords
+    it('should correctly parse legacy syntax with "top" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(top, #ff0000, #0000ff)');
+      let subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('top');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('hex');
+      expect(subject.colorStops[0].value).to.equal('ff0000');
+      expect(subject.colorStops[1].type).to.equal('hex');
+      expect(subject.colorStops[1].value).to.equal('0000ff');
+    });
+    
+    it('should correctly parse legacy syntax with "left" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(left, rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.8))');
+      let subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('left');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('rgba');
+      expect(subject.colorStops[0].value).to.eql(['255', '0', '0', '0.5']);
+      expect(subject.colorStops[1].type).to.equal('rgba');
+      expect(subject.colorStops[1].value).to.eql(['0', '0', '255', '0.8']);
+    });
+    
+    it('should correctly parse legacy syntax with "bottom" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(bottom, hsla(0, 100%, 50%, 0.3), hsla(240, 100%, 50%, 0.7))');
+      let subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('bottom');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('hsla');
+      expect(subject.colorStops[0].value).to.eql(['0', '100', '50', '0.3']);
+      expect(subject.colorStops[1].type).to.equal('hsla');
+      expect(subject.colorStops[1].value).to.eql(['240', '100', '50', '0.7']);
+    });
   });
 
   describe('parse all color types', function() {
