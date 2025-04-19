@@ -15,6 +15,19 @@ describe('lib/stringify.js', function () {
   });
 
   describe('serialization', function() {
+    it('should handle array input without error', function() {
+      const nodes = [{
+        type: 'linear-gradient',
+        colorStops: [{ type: 'literal', value: 'red' }, { type: 'literal', value: 'blue' }],
+        orientation: null
+      }];
+      
+      expect(function() {
+        const result = gradients.stringify(nodes);
+        expect(result).to.equal('linear-gradient(red, blue)');
+      }).to.not.throwException();
+    });
+
 
     it('if tree is null', function() {
       expect(gradients.stringify(null)).to.equal('');
