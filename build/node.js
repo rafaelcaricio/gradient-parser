@@ -307,8 +307,24 @@ GradientParser.parse = (function() {
   }
 
   function matchLinearOrientation() {
-    return matchSideOrCorner() ||
-      matchAngle();
+    // Check for standard CSS3 "to" direction
+    var sideOrCorner = matchSideOrCorner();
+    if (sideOrCorner) {
+      return sideOrCorner;
+    }
+    
+    // Check for legacy single keyword direction (e.g., "right", "top")
+    var legacyDirection = match('position-keyword', tokens.positionKeywords, 0);
+    if (legacyDirection) {
+      // For legacy syntax, we convert to the directional type
+      return {
+        type: 'directional',
+        value: legacyDirection.value
+      };
+    }
+    
+    // If neither, check for angle
+    return matchAngle();
   }
 
   function matchSideOrCorner() {

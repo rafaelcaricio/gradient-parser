@@ -153,6 +153,29 @@ describe('lib/parser.js', function () {
         });
       });
     });
+    
+    it('should correctly parse directional value without "to" keyword (legacy syntax)', function() {
+      // This uses the legacy syntax without "to" keyword (e.g., "right" instead of "to right")
+      const parsed = gradients.parse('-webkit-linear-gradient(right, rgb(248, 6, 234) 71%, rgb(202, 74, 208) 78%)');
+      subject = parsed[0];
+      
+      // It should properly identify the orientation as directional "right"
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('right');
+      
+      // And it should have only 2 color stops
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('rgb');
+      expect(subject.colorStops[0].value).to.eql(['248', '6', '234']);
+      expect(subject.colorStops[0].length.type).to.equal('%');
+      expect(subject.colorStops[0].length.value).to.equal('71');
+      
+      expect(subject.colorStops[1].type).to.equal('rgb');
+      expect(subject.colorStops[1].value).to.eql(['202', '74', '208']);
+      expect(subject.colorStops[1].length.type).to.equal('%');
+      expect(subject.colorStops[1].length.value).to.equal('78');
+    });
   });
 
   describe('parse all color types', function() {
