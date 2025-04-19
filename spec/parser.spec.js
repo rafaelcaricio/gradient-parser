@@ -159,7 +159,8 @@ describe('lib/parser.js', function () {
       {type: 'literal', unparsedValue: 'red', value: 'red'},
       {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
       {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
-      {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']}
+      {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']},
+      {type: 'var', unparsedValue: 'var(--color-red)', value: '--color-red'},
     ].forEach(function(color) {
       describe('parse color type '+ color.type, function() {
         beforeEach(function() {

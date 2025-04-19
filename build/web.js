@@ -27,6 +27,8 @@ GradientParser.parse = (function() {
     literalColor: /^([a-zA-Z]+)/,
     rgbColor: /^rgb/i,
     rgbaColor: /^rgba/i,
+    varColor: /^var/i,
+    variableName: /^(--[a-zA-Z0-9-,\s\#]+)/,
     number: /^(([0-9]*\.[0-9]+)|([0-9]+\.?))/
   };
 
@@ -262,6 +264,7 @@ GradientParser.parse = (function() {
     return matchHexColor() ||
       matchRGBAColor() ||
       matchRGBColor() ||
+      matchVarColor() ||
       matchLiteralColor();
   }
 
@@ -289,6 +292,19 @@ GradientParser.parse = (function() {
         value: matchListing(matchNumber)
       };
     });
+  }
+
+  function matchVarColor() {
+    return matchCall(tokens.varColor, function () {
+      return {
+        type: 'var',
+        value: matchVariableName()
+      };
+    });
+  }
+
+  function matchVariableName() {
+    return scan(tokens.variableName)[1];
   }
 
   function matchNumber() {
@@ -445,6 +461,10 @@ GradientParser.stringify = (function() {
 
     'visit_hex': function(node) {
       return visitor.visit_color('#' + node.value, node);
+    },
+
+    'visit_var': function(node) {
+      return visitor.visit_color('var(' + node.value + ')', node);
     },
 
     'visit_rgb': function(node) {
