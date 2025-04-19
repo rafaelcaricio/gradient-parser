@@ -476,6 +476,21 @@ describe('lib/parser.js', function () {
         expect(ast[0].colorStops[0].length.type).to.equal('calc');
         expect(ast[0].colorStops[0].length.value).to.equal('20% + 10px');
       });
+
+      it('should throw an error for unbalanced parentheses in calc expressions', function() {
+        // Different test cases throw different errors, so we need to be more specific
+        expect(function() {
+          gradients.parse('linear-gradient(to right, red calc(50% + (25px), blue)');
+        }).to.throwException();
+        
+        expect(function() {
+          gradients.parse('radial-gradient(circle at calc(50% + 25px, red, blue)');
+        }).to.throwException(/Missing comma before color stops/);
+        
+        expect(function() {
+          gradients.parse('linear-gradient(90deg, yellow calc(100% - (50px - 20px), green)');
+        }).to.throwException();
+      });
     });
   });
 
