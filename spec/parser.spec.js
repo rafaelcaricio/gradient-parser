@@ -176,6 +176,52 @@ describe('lib/parser.js', function () {
       expect(subject.colorStops[1].length.type).to.equal('%');
       expect(subject.colorStops[1].length.value).to.equal('78');
     });
+    
+    // Additional test cases for other legacy directional keywords
+    it('should correctly parse legacy syntax with "top" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(top, #ff0000, #0000ff)');
+      subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('top');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('hex');
+      expect(subject.colorStops[0].value).to.equal('ff0000');
+      expect(subject.colorStops[1].type).to.equal('hex');
+      expect(subject.colorStops[1].value).to.equal('0000ff');
+    });
+    
+    it('should correctly parse legacy syntax with "left" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(left, rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.8))');
+      subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('left');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('rgba');
+      expect(subject.colorStops[0].value).to.eql(['255', '0', '0', '0.5']);
+      expect(subject.colorStops[1].type).to.equal('rgba');
+      expect(subject.colorStops[1].value).to.eql(['0', '0', '255', '0.8']);
+    });
+    
+    it('should correctly parse legacy syntax with "bottom" direction', function() {
+      const parsed = gradients.parse('-webkit-linear-gradient(bottom, hsla(0, 100%, 50%, 0.3), hsla(240, 100%, 50%, 0.7))');
+      subject = parsed[0];
+      
+      expect(subject.orientation).to.be.an('object');
+      expect(subject.orientation.type).to.equal('directional');
+      expect(subject.orientation.value).to.equal('bottom');
+      
+      expect(subject.colorStops).to.have.length(2);
+      expect(subject.colorStops[0].type).to.equal('hsla');
+      expect(subject.colorStops[0].value).to.eql(['0', '100', '50', '0.3']);
+      expect(subject.colorStops[1].type).to.equal('hsla');
+      expect(subject.colorStops[1].value).to.eql(['240', '100', '50', '0.7']);
+    });
   });
 
   describe('parse all color types', function() {
