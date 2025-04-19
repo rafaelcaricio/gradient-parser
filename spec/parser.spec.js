@@ -297,6 +297,33 @@ describe('lib/parser.js', function () {
       expect(ast[0].colorStops[5].length.type).to.equal('%');
       expect(ast[0].colorStops[5].length.value).to.equal('33.3');
     });
+
+    it('should parse radial-gradient with position only (no shape/extent)', function() {
+      const gradient = 'radial-gradient(at 57% 50%, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%)';
+      const ast = gradients.parse(gradient);
+      
+      expect(ast[0].type).to.equal('radial-gradient');
+      
+      // Verify the orientation (position only)
+      expect(ast[0].orientation[0].type).to.equal('default-radial');
+      expect(ast[0].orientation[0].at.type).to.equal('position');
+      expect(ast[0].orientation[0].at.value.x.type).to.equal('%');
+      expect(ast[0].orientation[0].at.value.x.value).to.equal('57');
+      expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
+      expect(ast[0].orientation[0].at.value.y.value).to.equal('50');
+      
+      // Verify color stops
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['102', '126', '234']);
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length.value).to.equal('0');
+      
+      expect(ast[0].colorStops[1].type).to.equal('rgb');
+      expect(ast[0].colorStops[1].value).to.eql(['118', '75', '162']);
+      expect(ast[0].colorStops[1].length.type).to.equal('%');
+      expect(ast[0].colorStops[1].length.value).to.equal('100');
+    });
   });
 
   describe('parse gradient strings with trailing semicolons', function() {
