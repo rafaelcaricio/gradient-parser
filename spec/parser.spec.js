@@ -157,7 +157,7 @@ describe('lib/parser.js', function () {
     it('should correctly parse directional value without "to" keyword (legacy syntax)', function() {
       // This uses the legacy syntax without "to" keyword (e.g., "right" instead of "to right")
       const parsed = gradients.parse('-webkit-linear-gradient(right, rgb(248, 6, 234) 71%, rgb(202, 74, 208) 78%)');
-      subject = parsed[0];
+      let subject = parsed[0];
       
       // It should properly identify the orientation as directional "right"
       expect(subject.orientation).to.be.an('object');
@@ -180,7 +180,7 @@ describe('lib/parser.js', function () {
     // Additional test cases for other legacy directional keywords
     it('should correctly parse legacy syntax with "top" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(top, #ff0000, #0000ff)');
-      subject = parsed[0];
+      let subject = parsed[0];
       
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
@@ -195,7 +195,7 @@ describe('lib/parser.js', function () {
     
     it('should correctly parse legacy syntax with "left" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(left, rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.8))');
-      subject = parsed[0];
+      let subject = parsed[0];
       
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
@@ -210,7 +210,7 @@ describe('lib/parser.js', function () {
     
     it('should correctly parse legacy syntax with "bottom" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(bottom, hsla(0, 100%, 50%, 0.3), hsla(240, 100%, 50%, 0.7))');
-      subject = parsed[0];
+      let subject = parsed[0];
       
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
