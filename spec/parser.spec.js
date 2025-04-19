@@ -161,6 +161,9 @@ describe('lib/parser.js', function () {
       {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
       {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
       {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']},
+      {type: 'hsl', unparsedValue: 'hsl(120, 60%, 70%)', value: ['120', '60', '70']},
+      {type: 'hsla', unparsedValue: 'hsla(120, 60%, 70%, 0.3)', value: ['120', '60', '70', '0.3']},
+      {type: 'hsla', unparsedValue: 'hsla(240, 100%, 50%, 0.5)', value: ['240', '100', '50', '0.5']},
       {type: 'var', unparsedValue: 'var(--color-red)', value: '--color-red'},
     ].forEach(function(color) {
       describe('parse color type '+ color.type, function() {
@@ -173,6 +176,26 @@ describe('lib/parser.js', function () {
             expect(subject.type).to.equal(color.type);
             expect(subject.value).to.eql(color.value);
           });
+      });
+    });
+
+    describe('error cases for HSL/HSLA', function() {
+      it('should error on missing percentage for saturation', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120, 60, 70%))');
+        }).to.throwException(/Expected percentage value/);
+      });
+
+      it('should error on missing percentage for lightness', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120, 60%, 70))');
+        }).to.throwException(/Expected percentage value/);
+      });
+
+      it('should error on percentage for hue', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120%, 60%, 70%))');
+        }).to.throwException(/HSL hue value must be a number in degrees \(0-360\) or normalized \(-360 to 360\), not a percentage/);
       });
     });
   });
@@ -330,6 +353,28 @@ describe('lib/parser.js', function () {
       expect(ast[0].colorStops[1].value).to.eql(['172', '79', '115']);
       expect(ast[0].colorStops[1].length.type).to.equal('%');
       expect(ast[0].colorStops[1].length.value).to.equal('100');
+    });
+
+    describe('parse different color formats', function() {
+      const testGradients = [
+        'linear-gradient(red, blue)',
+        'linear-gradient(red, #00f)',
+        'linear-gradient(red, #0000ff)',
+        'linear-gradient(red, rgb(0, 0, 255))',
+        'linear-gradient(red, rgba(0, 0, 255, 1))',
+        'linear-gradient(red, hsl(240, 50%, 100%))',
+        'linear-gradient(red, hsla(240, 50%, 100%, 1))'
+      ];
+
+      testGradients.forEach(function(gradient) {
+        it('should parse ' + gradient, function() {
+          const result = gradients.parse(gradient);
+          expect(result[0].type).to.equal('linear-gradient');
+          expect(result[0].colorStops).to.have.length(2);
+          expect(result[0].colorStops[0].type).to.equal('literal');
+          expect(result[0].colorStops[0].value).to.equal('red');
+        });
+      });
     });
   });
 
