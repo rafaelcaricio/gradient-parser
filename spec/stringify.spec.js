@@ -82,6 +82,7 @@ describe('lib/stringify.js', function () {
       [
         'ellipse farthest-corner',
         'ellipse cover',
+        'ellipse 40px 134px at 50% 96%',
         'circle cover',
         'center bottom, ellipse cover',
         'circle at 87.23px -58.3px',

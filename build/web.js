@@ -192,7 +192,17 @@ GradientParser.parse = (function() {
     var ellipse = match('shape', /^(ellipse)/i, 0);
 
     if (ellipse) {
-      ellipse.style =  matchDistance() || matchExtentKeyword();
+      var first = matchDistance();
+      if (first) {
+        var second = matchDistance();
+        if (second) {
+          ellipse.style = { type: 'radii', value: [ first, second ] };
+        } else {
+          ellipse.style = first;
+        }
+      } else {
+        ellipse.style = matchExtentKeyword();
+      }
     }
 
     return ellipse;
@@ -360,7 +370,11 @@ GradientParser.parse = (function() {
   }
 
   return function(code) {
-    input = code.toString();
+    input = code.toString().trim();
+    // Remove trailing semicolon if present
+    if (input.endsWith(';')) {
+      input = input.slice(0, -1);
+    }
     return getAST();
   };
 })();
@@ -435,6 +449,9 @@ GradientParser.stringify = (function() {
       }
 
       return result;
+    },
+    'visit_radii': function(node) {
+      return visitor.visit(node.value[0]) + ' ' + visitor.visit(node.value[1]);
     },
 
     'visit_position-keyword': function(node) {
