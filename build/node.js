@@ -314,7 +314,7 @@ GradientParser.parse = (function() {
     }
     
     // Check for legacy single keyword direction (e.g., "right", "top")
-    var legacyDirection = match('position-keyword', tokens.positionKeywords, 0);
+    var legacyDirection = match('position-keyword', tokens.positionKeywords, 1);
     if (legacyDirection) {
       // For legacy syntax, we convert to the directional type
       return {
