@@ -30,7 +30,9 @@ GradientParser.parse = (function() {
     rgbaColor: /^rgba/i,
     varColor: /^var/i,
     variableName: /^(--[a-zA-Z0-9-,\s\#]+)/,
-    number: /^(([0-9]*\.[0-9]+)|([0-9]+\.?))/
+    number: /^(([0-9]*\.[0-9]+)|([0-9]+\.?))/,
+    hslColor: /^hsl/i,
+    hslaColor: /^hsla/i,
   };
 
   var input = '';
@@ -264,6 +266,8 @@ GradientParser.parse = (function() {
 
   function matchColor() {
     return matchHexColor() ||
+      matchHSLAColor() ||
+      matchHSLColor() ||
       matchRGBAColor() ||
       matchRGBColor() ||
       matchVarColor() ||
@@ -303,6 +307,41 @@ GradientParser.parse = (function() {
         value: matchVariableName()
       };
     });
+  }
+
+  function matchHSLColor() {
+    return matchCall(tokens.hslColor, function() {
+      var hue = matchNumber();
+      scan(tokens.comma);
+      var sat = matchPercentage();
+      scan(tokens.comma);
+      var light = matchPercentage();
+      return {
+        type: 'hsl',
+        value: [hue, sat, light]
+      };
+    });
+  }
+
+  function matchHSLAColor() {
+    return matchCall(tokens.hslaColor, function() {
+      var hue = matchNumber();
+      scan(tokens.comma);
+      var sat = matchPercentage();
+      scan(tokens.comma);
+      var light = matchPercentage();
+      scan(tokens.comma);
+      var alpha = matchNumber();
+      return {
+        type: 'hsla',
+        value: [hue, sat, light, alpha]
+      };
+    });
+  }
+
+  function matchPercentage() {
+    var captures = scan(tokens.percentageValue);
+    return captures ? captures[1] : null;
   }
 
   function matchVariableName() {
@@ -475,6 +514,16 @@ GradientParser.stringify = (function() {
 
     'visit_rgba': function(node) {
       return visitor.visit_color('rgba(' + node.value.join(', ') + ')', node);
+    },
+
+    'visit_hsl': function(node) {
+      const [h, s, l] = node.value;
+      return visitor.visit_color(`hsl(${h}, ${s}%, ${l}%)`, node);
+    },
+
+    'visit_hsla': function(node) {
+      const [h, s, l, a] = node.value;
+      return visitor.visit_color(`hsla(${h}, ${s}%, ${l}%, ${a})`, node);
     },
 
     'visit_var': function(node) {

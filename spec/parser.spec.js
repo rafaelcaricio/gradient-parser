@@ -161,6 +161,8 @@ describe('lib/parser.js', function () {
       {type: 'hex', unparsedValue: '#c2c2c2', value: 'c2c2c2'},
       {type: 'rgb', unparsedValue: 'rgb(243, 226, 195)', value: ['243', '226', '195']},
       {type: 'rgba', unparsedValue: 'rgba(243, 226, 195)', value: ['243', '226', '195']},
+      {type: 'hsl', unparsedValue: 'hsl(120, 60%, 70%)', value: ['120', '60', '70']},
+      {type: 'hsla', unparsedValue: 'hsla(120, 60%, 70%, 0.3)', value: ['120', '60', '70', '0.3']},
       {type: 'var', unparsedValue: 'var(--color-red)', value: '--color-red'},
     ].forEach(function(color) {
       describe('parse color type '+ color.type, function() {
@@ -173,6 +175,26 @@ describe('lib/parser.js', function () {
             expect(subject.type).to.equal(color.type);
             expect(subject.value).to.eql(color.value);
           });
+      });
+    });
+
+    describe('error cases for HSL/HSLA', function() {
+      it('should error on missing percentage for saturation', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120, 60, 70%))');
+        }).to.throwException(/Expected percentage value/);
+      });
+
+      it('should error on missing percentage for lightness', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120, 60%, 70))');
+        }).to.throwException(/Expected percentage value/);
+      });
+
+      it('should error on percentage for hue', function() {
+        expect(function() {
+          gradients.parse('linear-gradient(hsl(120%, 60%, 70%))');
+        }).to.throwException(/Expected color definition/);
       });
     });
   });
