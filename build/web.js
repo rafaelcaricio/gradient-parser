@@ -20,6 +20,7 @@ GradientParser.parse = (function() {
     percentageValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))\%/,
     emValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))em/,
     angleValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))deg/,
+    radianValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))rad/,
     startCall: /^\(/,
     endCall: /^\)/,
     comma: /^,/,
@@ -122,7 +123,8 @@ GradientParser.parse = (function() {
   }
 
   function matchAngle() {
-    return match('angular', tokens.angleValue, 1);
+    return match('angular', tokens.angleValue, 1) ||
+      match('angular', tokens.radianValue, 1);
   }
 
   function matchListRadialOrientations() {
