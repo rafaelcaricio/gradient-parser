@@ -1,6 +1,6 @@
 {
   "name": "gradient-parser",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Parse CSS3 gradient definitions and return an AST.",
   "author": {
     "name": "Rafael Carcicio",
@@ -25,7 +25,13 @@
   },
   "main": "build/node.js",
   "scripts": {
-    "test": "grunt"
+    "test": "mocha spec/**/*.js",
+    "build": "node build.js",
+    "build:node": "node build.js --node",
+    "build:web": "node build.js --web",
+    "build:minify": "node build.js --minify",
+    "start": "python -m SimpleHTTPServer 3000",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "library",
@@ -33,14 +39,9 @@
     "parser"
   ],
   "devDependencies": {
-    "expect.js": "*",
-    "grunt": "*",
-    "grunt-browserify": "^6.0.0",
-    "grunt-complexity": "*",
-    "grunt-contrib-concat": "^0.5.0",
-    "grunt-contrib-uglify": "^0.5.1",
-    "grunt-mocha-test": "^0.13.3",
-    "mocha": "*"
+    "expect.js": "^0.3.1",
+    "esbuild": "^0.20.2",
+    "mocha": "^10.3.0"
   },
   "engines": {
     "node": ">=0.10.0"

@@ -1,5 +1,7 @@
 # Gradient Parser
 
+[![npm version](https://badge.fury.io/js/gradient-parser.svg)](https://badge.fury.io/js/gradient-parser)
+
 ## About
 
 Parse CSS3 gradient definition and returns AST `object`.
@@ -36,9 +38,69 @@ Results in:
 ]
 ```
 
-## Install Choices
-- `bower install gradient-parser`
-- [download the zip](https://github.com/rafaelcaricio/gradient-parser/archive/master.zip)
+## Installation
+
+Install via npm:
+```bash
+npm install gradient-parser
+```
+
+Import in Node.js:
+```javascript
+const gradient = require('gradient-parser');
+```
+
+For browser usage:
+```html
+<script src="node_modules/gradient-parser/build/web.js"></script>
+```
+
+Or [download the zip](https://github.com/rafaelcaricio/gradient-parser/archive/master.zip)
+
+## Development
+
+### Project Status
+
+Gradient-parser has been modernized (as of v1.1.0):
+- Removed Bower support in favor of npm exclusively
+- Replaced Grunt with a modern build system using esbuild
+- Added minification support
+- Updated dependencies to specific versions
+- Improved npm scripts for better developer experience
+
+### Build
+
+Gradient-parser uses a modern build system with esbuild for building and minification.
+
+```bash
+# Build both Node.js and web bundles
+npm run build
+
+# Build only Node.js bundle
+npm run build:node
+
+# Build only web bundle
+npm run build:web
+
+# Build minified bundles
+npm run build:minify
+```
+
+### Testing
+
+Run the test suite with:
+
+```bash
+npm test
+```
+
+### Starting a local server
+
+You can run a simple HTTP server for development:
+
+```bash
+npm start
+```
 
 ## API
 
@@ -130,7 +192,7 @@ The available values of `node.type` are listed below, as well as the available p
 
 (The MIT License)
 
-Copyright (c) 2014 Rafael Caricio rafael@caricio.com
+Copyright (c) 2014-2025 Rafael Caricio rafael@caricio.com
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
