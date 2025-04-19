@@ -376,6 +376,107 @@ describe('lib/parser.js', function () {
         });
       });
     });
+
+    describe('parse calc expressions', function() {
+      it('should parse linear gradient with calc in color stop position', function() {
+        const gradient = 'linear-gradient(to right, red calc(10% + 20px), blue 50%)';
+        const ast = gradients.parse(gradient);
+        
+        expect(ast[0].type).to.equal('linear-gradient');
+        expect(ast[0].orientation.type).to.equal('directional');
+        expect(ast[0].orientation.value).to.equal('right');
+        
+        expect(ast[0].colorStops).to.have.length(2);
+        expect(ast[0].colorStops[0].type).to.equal('literal');
+        expect(ast[0].colorStops[0].value).to.equal('red');
+        expect(ast[0].colorStops[0].length.type).to.equal('calc');
+        expect(ast[0].colorStops[0].length.value).to.equal('10% + 20px');
+        
+        expect(ast[0].colorStops[1].type).to.equal('literal');
+        expect(ast[0].colorStops[1].value).to.equal('blue');
+        expect(ast[0].colorStops[1].length.type).to.equal('%');
+        expect(ast[0].colorStops[1].length.value).to.equal('50');
+      });
+
+      it('should parse radial gradient with calc in position', function() {
+        const gradient = 'radial-gradient(circle at calc(50% + 25px) 50%, red, blue)';
+        const ast = gradients.parse(gradient);
+        
+        expect(ast[0].type).to.equal('radial-gradient');
+        expect(ast[0].orientation[0].type).to.equal('shape');
+        expect(ast[0].orientation[0].value).to.equal('circle');
+        
+        // Check the position
+        expect(ast[0].orientation[0].at.type).to.equal('position');
+        expect(ast[0].orientation[0].at.value.x.type).to.equal('calc');
+        expect(ast[0].orientation[0].at.value.x.value).to.equal('50% + 25px');
+        expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
+        expect(ast[0].orientation[0].at.value.y.value).to.equal('50');
+        
+        // Check the color stops
+        expect(ast[0].colorStops).to.have.length(2);
+        expect(ast[0].colorStops[0].value).to.equal('red');
+        expect(ast[0].colorStops[1].value).to.equal('blue');
+      });
+
+      it('should parse calc expressions with multiple operations', function() {
+        const gradient = 'linear-gradient(90deg, yellow calc(100% - 50px), green calc(100% - 20px))';
+        const ast = gradients.parse(gradient);
+        
+        expect(ast[0].type).to.equal('linear-gradient');
+        expect(ast[0].orientation.type).to.equal('angular');
+        expect(ast[0].orientation.value).to.equal('90');
+        
+        expect(ast[0].colorStops).to.have.length(2);
+        expect(ast[0].colorStops[0].type).to.equal('literal');
+        expect(ast[0].colorStops[0].value).to.equal('yellow');
+        expect(ast[0].colorStops[0].length.type).to.equal('calc');
+        expect(ast[0].colorStops[0].length.value).to.equal('100% - 50px');
+        
+        expect(ast[0].colorStops[1].type).to.equal('literal');
+        expect(ast[0].colorStops[1].value).to.equal('green');
+        expect(ast[0].colorStops[1].length.type).to.equal('calc');
+        expect(ast[0].colorStops[1].length.value).to.equal('100% - 20px');
+      });
+      
+      it('should parse calc expressions with nested parentheses', function() {
+        const gradient = 'linear-gradient(to bottom, red calc(50% + (25px * 2)), blue)';
+        const ast = gradients.parse(gradient);
+        
+        expect(ast[0].type).to.equal('linear-gradient');
+        expect(ast[0].orientation.type).to.equal('directional');
+        expect(ast[0].orientation.value).to.equal('bottom');
+        
+        expect(ast[0].colorStops).to.have.length(2);
+        expect(ast[0].colorStops[0].type).to.equal('literal');
+        expect(ast[0].colorStops[0].value).to.equal('red');
+        expect(ast[0].colorStops[0].length.type).to.equal('calc');
+        expect(ast[0].colorStops[0].length.value).to.equal('50% + (25px * 2)');
+      });
+      
+      it('should parse multiple calc expressions in the same gradient', function() {
+        const gradient = 'radial-gradient(circle at calc(50% - 10px) calc(50% + 10px), red calc(20% + 10px), blue)';
+        const ast = gradients.parse(gradient);
+        
+        expect(ast[0].type).to.equal('radial-gradient');
+        expect(ast[0].orientation[0].type).to.equal('shape');
+        expect(ast[0].orientation[0].value).to.equal('circle');
+        
+        // Check the position
+        expect(ast[0].orientation[0].at.type).to.equal('position');
+        expect(ast[0].orientation[0].at.value.x.type).to.equal('calc');
+        expect(ast[0].orientation[0].at.value.x.value).to.equal('50% - 10px');
+        expect(ast[0].orientation[0].at.value.y.type).to.equal('calc');
+        expect(ast[0].orientation[0].at.value.y.value).to.equal('50% + 10px');
+        
+        // Check the color stops
+        expect(ast[0].colorStops).to.have.length(2);
+        expect(ast[0].colorStops[0].type).to.equal('literal');
+        expect(ast[0].colorStops[0].value).to.equal('red');
+        expect(ast[0].colorStops[0].length.type).to.equal('calc');
+        expect(ast[0].colorStops[0].length.value).to.equal('20% + 10px');
+      });
+    });
   });
 
 });
