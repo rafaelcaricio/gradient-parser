@@ -655,7 +655,7 @@ GradientParser.stringify = (function() {
       var result = '';
 
       if (element instanceof Array) {
-        return visitor.visit_array(element, result);
+        return visitor.visit_array(element);
       } else if (typeof element === 'object' && !element.type) {
         return visitor.visit_object(element);
       } else if (element.type) {
