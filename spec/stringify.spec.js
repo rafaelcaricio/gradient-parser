@@ -21,7 +21,7 @@ describe('lib/stringify.js', function () {
         colorStops: [{ type: 'literal', value: 'red' }, { type: 'literal', value: 'blue' }],
         orientation: null
       }];
-      
+
       expect(function() {
         const result = gradients.stringify(nodes);
         expect(result).to.equal('linear-gradient(red, blue)');
@@ -65,6 +65,11 @@ describe('lib/stringify.js', function () {
 
     it('should serialize gradient with directional', function() {
       var gradientDef = 'linear-gradient(to left, #fff, transparent)';
+      expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+    });
+
+    it('should serialize conic gradient', function() {
+      var gradientDef = 'conic-gradient(red, yellow, green)';
       expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
     });
 

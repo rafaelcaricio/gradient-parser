@@ -155,54 +155,54 @@ describe('lib/parser.js', function () {
         });
       });
     });
-    
+
     it('should correctly parse directional value without "to" keyword (legacy syntax)', function() {
       // This uses the legacy syntax without "to" keyword (e.g., "right" instead of "to right")
       const parsed = gradients.parse('-webkit-linear-gradient(right, rgb(248, 6, 234) 71%, rgb(202, 74, 208) 78%)');
       let subject = parsed[0];
-      
+
       // It should properly identify the orientation as directional "right"
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
       expect(subject.orientation.value).to.equal('right');
-      
+
       // And it should have only 2 color stops
       expect(subject.colorStops).to.have.length(2);
       expect(subject.colorStops[0].type).to.equal('rgb');
       expect(subject.colorStops[0].value).to.eql(['248', '6', '234']);
       expect(subject.colorStops[0].length.type).to.equal('%');
       expect(subject.colorStops[0].length.value).to.equal('71');
-      
+
       expect(subject.colorStops[1].type).to.equal('rgb');
       expect(subject.colorStops[1].value).to.eql(['202', '74', '208']);
       expect(subject.colorStops[1].length.type).to.equal('%');
       expect(subject.colorStops[1].length.value).to.equal('78');
     });
-    
+
     // Additional test cases for other legacy directional keywords
     it('should correctly parse legacy syntax with "top" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(top, #ff0000, #0000ff)');
       let subject = parsed[0];
-      
+
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
       expect(subject.orientation.value).to.equal('top');
-      
+
       expect(subject.colorStops).to.have.length(2);
       expect(subject.colorStops[0].type).to.equal('hex');
       expect(subject.colorStops[0].value).to.equal('ff0000');
       expect(subject.colorStops[1].type).to.equal('hex');
       expect(subject.colorStops[1].value).to.equal('0000ff');
     });
-    
+
     it('should correctly parse "to bottom" direction (modern syntax)', function() {
       const parsed = gradients.parse('linear-gradient(to bottom, rgb(0, 91, 154), rgb(230, 193, 61))');
       let subject = parsed[0];
-      
+
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
       expect(subject.orientation.value).to.equal('bottom');
-      
+
       expect(subject.colorStops).to.have.length(2);
       expect(subject.colorStops[0].type).to.equal('rgb');
       expect(subject.colorStops[0].value).to.eql(['0', '91', '154']);
@@ -213,26 +213,26 @@ describe('lib/parser.js', function () {
     it('should correctly parse legacy syntax with "left" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(left, rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.8))');
       let subject = parsed[0];
-      
+
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
       expect(subject.orientation.value).to.equal('left');
-      
+
       expect(subject.colorStops).to.have.length(2);
       expect(subject.colorStops[0].type).to.equal('rgba');
       expect(subject.colorStops[0].value).to.eql(['255', '0', '0', '0.5']);
       expect(subject.colorStops[1].type).to.equal('rgba');
       expect(subject.colorStops[1].value).to.eql(['0', '0', '255', '0.8']);
     });
-    
+
     it('should correctly parse legacy syntax with "bottom" direction', function() {
       const parsed = gradients.parse('-webkit-linear-gradient(bottom, hsla(0, 100%, 50%, 0.3), hsla(240, 100%, 50%, 0.7))');
       let subject = parsed[0];
-      
+
       expect(subject.orientation).to.be.an('object');
       expect(subject.orientation.type).to.equal('directional');
       expect(subject.orientation.value).to.equal('bottom');
-      
+
       expect(subject.colorStops).to.have.length(2);
       expect(subject.colorStops[0].type).to.equal('hsla');
       expect(subject.colorStops[0].value).to.eql(['0', '100', '50', '0.3']);
@@ -290,8 +290,10 @@ describe('lib/parser.js', function () {
     [
       'linear-gradient',
       'radial-gradient',
+      'conic-gradient',
       'repeating-linear-gradient',
-      'repeating-radial-gradient'
+      'repeating-radial-gradient',
+      'repeating-conic-gradient',
     ].forEach(function(gradient) {
       describe('parse ' + gradient + ' gradient', function() {
         beforeEach(function() {
@@ -323,61 +325,61 @@ describe('lib/parser.js', function () {
       });
 
     });
-    
+
     it('should parse ellipse with dimensions and position', function() {
       const gradient = 'repeating-radial-gradient(ellipse 40px 134px at 50% 96%, rgb(0, 165, 223) 0%, rgb(62, 20, 123) 6.6%)';
       const ast = gradients.parse(gradient);
-      
+
       expect(ast[0].type).to.equal('repeating-radial-gradient');
       expect(ast[0].orientation[0].type).to.equal('shape');
       expect(ast[0].orientation[0].value).to.equal('ellipse');
-      
+
       // Check the style (size dimensions)
       expect(ast[0].orientation[0].style.type).to.equal('position');
       expect(ast[0].orientation[0].style.value.x.type).to.equal('px');
       expect(ast[0].orientation[0].style.value.x.value).to.equal('40');
       expect(ast[0].orientation[0].style.value.y.type).to.equal('px');
       expect(ast[0].orientation[0].style.value.y.value).to.equal('134');
-      
+
       // Check the position
       expect(ast[0].orientation[0].at.type).to.equal('position');
       expect(ast[0].orientation[0].at.value.x.type).to.equal('%');
       expect(ast[0].orientation[0].at.value.x.value).to.equal('50');
       expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
       expect(ast[0].orientation[0].at.value.y.value).to.equal('96');
-      
+
       // Check the color stops
       expect(ast[0].colorStops).to.have.length(2);
       expect(ast[0].colorStops[0].type).to.equal('rgb');
       expect(ast[0].colorStops[0].value).to.eql(['0', '165', '223']);
       expect(ast[0].colorStops[0].length.type).to.equal('%');
       expect(ast[0].colorStops[0].length.value).to.equal('0');
-      
+
       expect(ast[0].colorStops[1].type).to.equal('rgb');
       expect(ast[0].colorStops[1].value).to.eql(['62', '20', '123']);
       expect(ast[0].colorStops[1].length.type).to.equal('%');
       expect(ast[0].colorStops[1].length.value).to.equal('6.6');
     });
-    
+
     it('should parse full Pride flag gradient', function() {
       const gradient = 'repeating-radial-gradient(ellipse 40px 134px at 50% 96%,rgb(0, 165, 223) 0%,rgb(62, 20, 123) 6.6%,rgb(226, 0, 121) 13.2%,rgb(223, 19, 44) 18.8%,rgb(243, 239, 21) 24.1%,rgb(0, 152, 71) 33.3%)';
       const ast = gradients.parse(gradient);
-      
+
       expect(ast[0].type).to.equal('repeating-radial-gradient');
       expect(ast[0].orientation[0].type).to.equal('shape');
       expect(ast[0].orientation[0].value).to.equal('ellipse');
-      
+
       // Check dimensions and position
       expect(ast[0].orientation[0].style.type).to.equal('position');
       expect(ast[0].orientation[0].at.type).to.equal('position');
-      
+
       // Verify all color stops are present (Pride flag colors)
       expect(ast[0].colorStops).to.have.length(6);
-      
+
       // Check the first and last color stops
       expect(ast[0].colorStops[0].type).to.equal('rgb');
       expect(ast[0].colorStops[0].value).to.eql(['0', '165', '223']);
-      
+
       expect(ast[0].colorStops[5].type).to.equal('rgb');
       expect(ast[0].colorStops[5].value).to.eql(['0', '152', '71']);
       expect(ast[0].colorStops[5].length.type).to.equal('%');
@@ -387,9 +389,9 @@ describe('lib/parser.js', function () {
     it('should parse radial-gradient with position only (no shape/extent)', function() {
       const gradient = 'radial-gradient(at 57% 50%, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%)';
       const ast = gradients.parse(gradient);
-      
+
       expect(ast[0].type).to.equal('radial-gradient');
-      
+
       // Verify the orientation (position only)
       expect(ast[0].orientation[0].type).to.equal('default-radial');
       expect(ast[0].orientation[0].at.type).to.equal('position');
@@ -397,14 +399,14 @@ describe('lib/parser.js', function () {
       expect(ast[0].orientation[0].at.value.x.value).to.equal('57');
       expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
       expect(ast[0].orientation[0].at.value.y.value).to.equal('50');
-      
+
       // Verify color stops
       expect(ast[0].colorStops).to.have.length(2);
       expect(ast[0].colorStops[0].type).to.equal('rgb');
       expect(ast[0].colorStops[0].value).to.eql(['102', '126', '234']);
       expect(ast[0].colorStops[0].length.type).to.equal('%');
       expect(ast[0].colorStops[0].length.value).to.equal('0');
-      
+
       expect(ast[0].colorStops[1].type).to.equal('rgb');
       expect(ast[0].colorStops[1].value).to.eql(['118', '75', '162']);
       expect(ast[0].colorStops[1].length.type).to.equal('%');
@@ -451,17 +453,17 @@ describe('lib/parser.js', function () {
     it('should parse repeating linear gradient with bottom right direction', function() {
       const gradient = 'repeating-linear-gradient(to bottom right,rgb(254, 158, 150) 0%,rgb(172, 79, 115) 100%)';
       const ast = gradients.parse(gradient);
-      
+
       expect(ast[0].type).to.equal('repeating-linear-gradient');
       expect(ast[0].orientation.type).to.equal('directional');
       expect(ast[0].orientation.value).to.equal('bottom right');
-      
+
       expect(ast[0].colorStops).to.have.length(2);
       expect(ast[0].colorStops[0].type).to.equal('rgb');
       expect(ast[0].colorStops[0].value).to.eql(['254', '158', '150']);
       expect(ast[0].colorStops[0].length.type).to.equal('%');
       expect(ast[0].colorStops[0].length.value).to.equal('0');
-      
+
       expect(ast[0].colorStops[1].type).to.equal('rgb');
       expect(ast[0].colorStops[1].value).to.eql(['172', '79', '115']);
       expect(ast[0].colorStops[1].length.type).to.equal('%');
@@ -494,17 +496,17 @@ describe('lib/parser.js', function () {
       it('should parse linear gradient with calc in color stop position', function() {
         const gradient = 'linear-gradient(to right, red calc(10% + 20px), blue 50%)';
         const ast = gradients.parse(gradient);
-        
+
         expect(ast[0].type).to.equal('linear-gradient');
         expect(ast[0].orientation.type).to.equal('directional');
         expect(ast[0].orientation.value).to.equal('right');
-        
+
         expect(ast[0].colorStops).to.have.length(2);
         expect(ast[0].colorStops[0].type).to.equal('literal');
         expect(ast[0].colorStops[0].value).to.equal('red');
         expect(ast[0].colorStops[0].length.type).to.equal('calc');
         expect(ast[0].colorStops[0].length.value).to.equal('10% + 20px');
-        
+
         expect(ast[0].colorStops[1].type).to.equal('literal');
         expect(ast[0].colorStops[1].value).to.equal('blue');
         expect(ast[0].colorStops[1].length.type).to.equal('%');
@@ -514,18 +516,18 @@ describe('lib/parser.js', function () {
       it('should parse radial gradient with calc in position', function() {
         const gradient = 'radial-gradient(circle at calc(50% + 25px) 50%, red, blue)';
         const ast = gradients.parse(gradient);
-        
+
         expect(ast[0].type).to.equal('radial-gradient');
         expect(ast[0].orientation[0].type).to.equal('shape');
         expect(ast[0].orientation[0].value).to.equal('circle');
-        
+
         // Check the position
         expect(ast[0].orientation[0].at.type).to.equal('position');
         expect(ast[0].orientation[0].at.value.x.type).to.equal('calc');
         expect(ast[0].orientation[0].at.value.x.value).to.equal('50% + 25px');
         expect(ast[0].orientation[0].at.value.y.type).to.equal('%');
         expect(ast[0].orientation[0].at.value.y.value).to.equal('50');
-        
+
         // Check the color stops
         expect(ast[0].colorStops).to.have.length(2);
         expect(ast[0].colorStops[0].value).to.equal('red');
@@ -535,53 +537,53 @@ describe('lib/parser.js', function () {
       it('should parse calc expressions with multiple operations', function() {
         const gradient = 'linear-gradient(90deg, yellow calc(100% - 50px), green calc(100% - 20px))';
         const ast = gradients.parse(gradient);
-        
+
         expect(ast[0].type).to.equal('linear-gradient');
         expect(ast[0].orientation.type).to.equal('angular');
         expect(ast[0].orientation.value).to.equal('90');
-        
+
         expect(ast[0].colorStops).to.have.length(2);
         expect(ast[0].colorStops[0].type).to.equal('literal');
         expect(ast[0].colorStops[0].value).to.equal('yellow');
         expect(ast[0].colorStops[0].length.type).to.equal('calc');
         expect(ast[0].colorStops[0].length.value).to.equal('100% - 50px');
-        
+
         expect(ast[0].colorStops[1].type).to.equal('literal');
         expect(ast[0].colorStops[1].value).to.equal('green');
         expect(ast[0].colorStops[1].length.type).to.equal('calc');
         expect(ast[0].colorStops[1].length.value).to.equal('100% - 20px');
       });
-      
+
       it('should parse calc expressions with nested parentheses', function() {
         const gradient = 'linear-gradient(to bottom, red calc(50% + (25px * 2)), blue)';
         const ast = gradients.parse(gradient);
-        
+
         expect(ast[0].type).to.equal('linear-gradient');
         expect(ast[0].orientation.type).to.equal('directional');
         expect(ast[0].orientation.value).to.equal('bottom');
-        
+
         expect(ast[0].colorStops).to.have.length(2);
         expect(ast[0].colorStops[0].type).to.equal('literal');
         expect(ast[0].colorStops[0].value).to.equal('red');
         expect(ast[0].colorStops[0].length.type).to.equal('calc');
         expect(ast[0].colorStops[0].length.value).to.equal('50% + (25px * 2)');
       });
-      
+
       it('should parse multiple calc expressions in the same gradient', function() {
         const gradient = 'radial-gradient(circle at calc(50% - 10px) calc(50% + 10px), red calc(20% + 10px), blue)';
         const ast = gradients.parse(gradient);
-        
+
         expect(ast[0].type).to.equal('radial-gradient');
         expect(ast[0].orientation[0].type).to.equal('shape');
         expect(ast[0].orientation[0].value).to.equal('circle');
-        
+
         // Check the position
         expect(ast[0].orientation[0].at.type).to.equal('position');
         expect(ast[0].orientation[0].at.value.x.type).to.equal('calc');
         expect(ast[0].orientation[0].at.value.x.value).to.equal('50% - 10px');
         expect(ast[0].orientation[0].at.value.y.type).to.equal('calc');
         expect(ast[0].orientation[0].at.value.y.value).to.equal('50% + 10px');
-        
+
         // Check the color stops
         expect(ast[0].colorStops).to.have.length(2);
         expect(ast[0].colorStops[0].type).to.equal('literal');
@@ -595,11 +597,11 @@ describe('lib/parser.js', function () {
         expect(function() {
           gradients.parse('linear-gradient(to right, red calc(50% + (25px), blue)');
         }).to.throwException();
-        
+
         expect(function() {
           gradients.parse('radial-gradient(circle at calc(50% + 25px, red, blue)');
         }).to.throwException(/Missing comma before color stops/);
-        
+
         expect(function() {
           gradients.parse('linear-gradient(90deg, yellow calc(100% - (50px - 20px), green)');
         }).to.throwException();
