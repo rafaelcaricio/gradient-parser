@@ -1,7 +1,7 @@
 var GradientParser = (window.GradientParser || {});
 
 // Copyright (c) 2014 Rafael Caricio. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
+// Use of this source code is governed by an MIT license that can be
 // found in the LICENSE file.
 
 var GradientParser = (GradientParser || {});
@@ -13,18 +13,30 @@ GradientParser.parse = (function() {
     repeatingLinearGradient: /^(\-(webkit|o|ms|moz)\-)?(repeating\-linear\-gradient)/i,
     radialGradient: /^(\-(webkit|o|ms|moz)\-)?(radial\-gradient)/i,
     repeatingRadialGradient: /^(\-(webkit|o|ms|moz)\-)?(repeating\-radial\-gradient)/i,
+    conicGradient: /^(\-(webkit|o|ms|moz)\-)?(conic\-gradient)/i,
+    repeatingConicGradient: /^(\-(webkit|o|ms|moz)\-)?(repeating\-conic\-gradient)/i,
     sideOrCorner: /^to (left (top|bottom)|right (top|bottom)|top (left|right)|bottom (left|right)|left|right|top|bottom)/i,
     extentKeywords: /^(closest\-side|closest\-corner|farthest\-side|farthest\-corner|contain|cover)/,
     positionKeywords: /^(left|center|right|top|bottom)/i,
     pixelValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))px/,
     percentageValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))\%/,
     emValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))em/,
+    remValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))rem/,
+    vwValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))vw/,
+    vhValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))vh/,
+    vminValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))vmin/,
+    vmaxValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))vmax/,
+    chValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))ch/,
+    exValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))ex/,
     angleValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))deg/,
     radianValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))rad/,
+    gradianValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))grad/,
+    turnValue: /^(-?(([0-9]*\.[0-9]+)|([0-9]+\.?)))turn/,
     startCall: /^\(/,
     endCall: /^\)/,
     comma: /^,/,
-    hexColor: /^\#([0-9a-fA-F]+)/,
+    slash: /^\//,
+    hexColor: /^\#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/,
     literalColor: /^([a-zA-Z]+)/,
     rgbColor: /^rgb/i,
     rgbaColor: /^rgba/i,
@@ -77,7 +89,17 @@ GradientParser.parse = (function() {
           matchGradient(
             'repeating-radial-gradient',
             tokens.repeatingRadialGradient,
-            matchListRadialOrientations);
+            matchListRadialOrientations) ||
+
+          matchGradient(
+            'conic-gradient',
+            tokens.conicGradient,
+            matchConicOrientation) ||
+
+          matchGradient(
+            'repeating-conic-gradient',
+            tokens.repeatingConicGradient,
+            matchConicOrientation);
   }
 
   function matchGradient(gradientType, pattern, orientationMatcher) {
@@ -137,13 +159,49 @@ GradientParser.parse = (function() {
     return matchAngle();
   }
 
+  function matchConicOrientation() {
+    var angle = matchFrom();
+    var atPosition = matchAtPosition();
+
+    if (angle || atPosition) {
+      return {
+        type: 'conic',
+        angle: angle || undefined,
+        at: atPosition || undefined
+      };
+    }
+  }
+
+  function matchFrom() {
+    if (match('from', /^from/, 0)) {
+      var angle = matchAngle();
+      if (!angle) {
+        error('Missing angle after "from" in conic-gradient');
+      }
+      return angle;
+    }
+  }
+
   function matchSideOrCorner() {
     return match('directional', tokens.sideOrCorner, 1);
   }
 
   function matchAngle() {
-    return match('angular', tokens.angleValue, 1) ||
-      match('angular', tokens.radianValue, 1);
+    return matchAngularWithUnit('deg', tokens.angleValue) ||
+      matchAngularWithUnit('rad', tokens.radianValue) ||
+      matchAngularWithUnit('grad', tokens.gradianValue) ||
+      matchAngularWithUnit('turn', tokens.turnValue);
+  }
+
+  function matchAngularWithUnit(unit, pattern) {
+    var captures = scan(pattern);
+    if (captures) {
+      return {
+        type: 'angular',
+        value: captures[1],
+        unit: unit
+      };
+    }
   }
 
   function matchListRadialOrientations() {
@@ -189,7 +247,8 @@ GradientParser.parse = (function() {
         if (atPosition) {
           radialType = {
             type: 'default-radial',
-            at: atPosition
+            at: atPosition,
+            hasAtKeyword: true
           };
         } else {
           var defaultPosition = matchPositioning();
@@ -287,6 +346,9 @@ GradientParser.parse = (function() {
     }
 
     color.length = matchDistance();
+    if (color.length) {
+      color.length2 = matchDistance();
+    }
     return color;
   }
 
@@ -310,20 +372,41 @@ GradientParser.parse = (function() {
 
   function matchRGBColor() {
     return matchCall(tokens.rgbColor, function() {
-      return  {
-        type: 'rgb',
-        value: matchListing(matchNumber)
-      };
+      return matchRGBValues('rgb');
     });
   }
 
   function matchRGBAColor() {
     return matchCall(tokens.rgbaColor, function() {
-      return  {
-        type: 'rgba',
-        value: matchListing(matchNumber)
-      };
+      return matchRGBValues('rgba');
     });
+  }
+
+  function matchRGBValues(baseType) {
+    var r = matchNumber();
+    var lookaheadCache = input;
+    if (scan(tokens.comma)) {
+      // Legacy comma-separated syntax: rgb(r, g, b) or rgba(r, g, b, a)
+      var g = matchNumber();
+      scan(tokens.comma);
+      var b = matchNumber();
+      var values = [r, g, b];
+      if (scan(tokens.comma)) {
+        values.push(matchNumber());
+        return { type: baseType === 'rgba' ? 'rgba' : 'rgba', value: values };
+      }
+      return { type: baseType, value: values };
+    } else {
+      // Modern space-separated syntax: rgb(r g b) or rgb(r g b / a)
+      var g = matchNumber();
+      var b = matchNumber();
+      var values = [r, g, b];
+      if (scan(tokens.slash)) {
+        values.push(matchNumber());
+        return { type: 'rgba', value: values };
+      }
+      return { type: baseType, value: values };
+    }
   }
 
   function matchVarColor() {
@@ -337,14 +420,26 @@ GradientParser.parse = (function() {
 
   function matchHSLColor() {
     return matchCall(tokens.hslColor, function() {
-      // Check for percentage before trying to parse the hue
-      var lookahead = scan(tokens.percentageValue);
-      if (lookahead) {
-        error('HSL hue value must be a number in degrees (0-360) or normalized (-360 to 360), not a percentage');
-      }
-      
-      var hue = matchNumber();
-      scan(tokens.comma);
+      return matchHSLValues('hsl');
+    });
+  }
+
+  function matchHSLAColor() {
+    return matchCall(tokens.hslaColor, function() {
+      return matchHSLValues('hsla');
+    });
+  }
+
+  function matchHSLValues(baseType) {
+    // Check for percentage before trying to parse the hue
+    var lookahead = scan(tokens.percentageValue);
+    if (lookahead) {
+      error('HSL hue value must be a number in degrees (0-360) or normalized (-360 to 360), not a percentage');
+    }
+
+    var hue = matchNumber();
+    if (scan(tokens.comma)) {
+      // Legacy comma-separated syntax: hsl(h, s%, l%) or hsla(h, s%, l%, a)
       var captures = scan(tokens.percentageValue);
       var sat = captures ? captures[1] : null;
       scan(tokens.comma);
@@ -353,32 +448,26 @@ GradientParser.parse = (function() {
       if (!sat || !light) {
         error('Expected percentage value for saturation and lightness in HSL');
       }
-      return {
-        type: 'hsl',
-        value: [hue, sat, light]
-      };
-    });
-  }
-
-  function matchHSLAColor() {
-    return matchCall(tokens.hslaColor, function() {
-      var hue = matchNumber();
-      scan(tokens.comma);
+      if (scan(tokens.comma)) {
+        var alpha = matchNumber();
+        return { type: 'hsla', value: [hue, sat, light, alpha] };
+      }
+      return { type: baseType, value: [hue, sat, light] };
+    } else {
+      // Modern space-separated syntax: hsl(h s% l%) or hsl(h s% l% / a)
       var captures = scan(tokens.percentageValue);
       var sat = captures ? captures[1] : null;
-      scan(tokens.comma);
       captures = scan(tokens.percentageValue);
       var light = captures ? captures[1] : null;
-      scan(tokens.comma);
-      var alpha = matchNumber();
       if (!sat || !light) {
-        error('Expected percentage value for saturation and lightness in HSLA');
+        error('Expected percentage value for saturation and lightness in HSL');
       }
-      return {
-        type: 'hsla',
-        value: [hue, sat, light, alpha]
-      };
-    });
+      if (scan(tokens.slash)) {
+        var alpha = matchNumber();
+        return { type: 'hsla', value: [hue, sat, light, alpha] };
+      }
+      return { type: baseType, value: [hue, sat, light] };
+    }
   }
 
   function matchPercentage() {
@@ -441,7 +530,14 @@ GradientParser.parse = (function() {
 
   function matchLength() {
     return match('px', tokens.pixelValue, 1) ||
-      match('em', tokens.emValue, 1);
+      match('em', tokens.emValue, 1) ||
+      match('rem', tokens.remValue, 1) ||
+      match('vw', tokens.vwValue, 1) ||
+      match('vh', tokens.vhValue, 1) ||
+      match('vmin', tokens.vminValue, 1) ||
+      match('vmax', tokens.vmaxValue, 1) ||
+      match('ch', tokens.chValue, 1) ||
+      match('ex', tokens.exValue, 1);
   }
 
   function match(type, pattern, captureIndex) {
@@ -472,7 +568,7 @@ GradientParser.parse = (function() {
   }
 
   function consume(size) {
-    input = input.substr(size);
+    input = input.substring(size);
   }
 
   return function(code) {
@@ -486,7 +582,7 @@ GradientParser.parse = (function() {
 })();
 
 // Copyright (c) 2014 Rafael Caricio. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
+// Use of this source code is governed by an MIT license that can be
 // found in the LICENSE file.
 
 var GradientParser = (GradientParser || {});
@@ -508,6 +604,14 @@ GradientParser.stringify = (function() {
     },
 
     'visit_repeating-radial-gradient': function(node) {
+      return visitor.visit_gradient(node);
+    },
+
+    'visit_conic-gradient': function(node) {
+      return visitor.visit_gradient(node);
+    },
+
+    'visit_repeating-conic-gradient': function(node) {
       return visitor.visit_gradient(node);
     },
 
@@ -541,7 +645,11 @@ GradientParser.stringify = (function() {
           at = visitor.visit(node.at);
 
       if (at) {
-        result += at;
+        if (node.hasAtKeyword) {
+          result += 'at ' + at;
+        } else {
+          result += at;
+        }
       }
       return result;
     },
@@ -575,6 +683,34 @@ GradientParser.stringify = (function() {
 
     'visit_px': function(node) {
       return node.value + 'px';
+    },
+
+    'visit_rem': function(node) {
+      return node.value + 'rem';
+    },
+
+    'visit_vw': function(node) {
+      return node.value + 'vw';
+    },
+
+    'visit_vh': function(node) {
+      return node.value + 'vh';
+    },
+
+    'visit_vmin': function(node) {
+      return node.value + 'vmin';
+    },
+
+    'visit_vmax': function(node) {
+      return node.value + 'vmax';
+    },
+
+    'visit_ch': function(node) {
+      return node.value + 'ch';
+    },
+
+    'visit_ex': function(node) {
+      return node.value + 'ex';
     },
 
     'visit_calc': function(node) {
@@ -616,15 +752,33 @@ GradientParser.stringify = (function() {
       if (length) {
         result += ' ' + length;
       }
+      var length2 = visitor.visit(node.length2);
+      if (length2) {
+        result += ' ' + length2;
+      }
       return result;
     },
 
     'visit_angular': function(node) {
-      return node.value + 'deg';
+      return node.value + (node.unit || 'deg');
     },
 
     'visit_directional': function(node) {
       return 'to ' + node.value;
+    },
+
+    'visit_conic': function(node) {
+      var result = '';
+      if (node.angle) {
+        result += 'from ' + visitor.visit(node.angle);
+      }
+      if (node.at) {
+        if (result) {
+          result += ' ';
+        }
+        result += 'at ' + visitor.visit(node.at);
+      }
+      return result;
     },
 
     'visit_array': function(elements) {

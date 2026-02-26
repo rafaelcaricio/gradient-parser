@@ -30,7 +30,7 @@
     "build:node": "node build.js --node",
     "build:web": "node build.js --web",
     "build:minify": "node build.js --minify",
-    "start": "python -m SimpleHTTPServer 3000",
+    "start": "python3 -m http.server 3000",
     "prepublish": "npm run build"
   },
   "keywords": [

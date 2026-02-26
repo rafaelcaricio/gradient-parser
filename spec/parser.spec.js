@@ -607,4 +607,189 @@ describe('lib/parser.js', function () {
     });
   });
 
+  describe('parse conic gradients', function() {
+    it('should parse simple conic-gradient', function() {
+      var ast = gradients.parse('conic-gradient(red, blue)');
+      expect(ast[0].type).to.equal('conic-gradient');
+      expect(ast[0].colorStops).to.have.length(2);
+      expect(ast[0].colorStops[0].value).to.equal('red');
+      expect(ast[0].colorStops[1].value).to.equal('blue');
+    });
+
+    it('should parse conic-gradient with from angle', function() {
+      var ast = gradients.parse('conic-gradient(from 45deg, red, blue)');
+      expect(ast[0].type).to.equal('conic-gradient');
+      expect(ast[0].orientation.type).to.equal('conic');
+      expect(ast[0].orientation.angle.type).to.equal('angular');
+      expect(ast[0].orientation.angle.value).to.equal('45');
+      expect(ast[0].orientation.angle.unit).to.equal('deg');
+    });
+
+    it('should parse conic-gradient with at position', function() {
+      var ast = gradients.parse('conic-gradient(at 50% 50%, red, blue)');
+      expect(ast[0].type).to.equal('conic-gradient');
+      expect(ast[0].orientation.type).to.equal('conic');
+      expect(ast[0].orientation.at.type).to.equal('position');
+      expect(ast[0].orientation.at.value.x.value).to.equal('50');
+      expect(ast[0].orientation.at.value.y.value).to.equal('50');
+    });
+
+    it('should parse conic-gradient with from angle and at position', function() {
+      var ast = gradients.parse('conic-gradient(from 90deg at 25% 75%, red, yellow, blue)');
+      expect(ast[0].type).to.equal('conic-gradient');
+      expect(ast[0].orientation.angle.value).to.equal('90');
+      expect(ast[0].orientation.angle.unit).to.equal('deg');
+      expect(ast[0].orientation.at.type).to.equal('position');
+      expect(ast[0].orientation.at.value.x.value).to.equal('25');
+      expect(ast[0].orientation.at.value.y.value).to.equal('75');
+      expect(ast[0].colorStops).to.have.length(3);
+    });
+
+    it('should parse repeating-conic-gradient', function() {
+      var ast = gradients.parse('repeating-conic-gradient(from 0deg, red 0%, blue 25%)');
+      expect(ast[0].type).to.equal('repeating-conic-gradient');
+      expect(ast[0].orientation.angle.value).to.equal('0');
+      expect(ast[0].colorStops).to.have.length(2);
+    });
+  });
+
+  describe('parse additional angle units', function() {
+    it('should parse grad angle unit', function() {
+      var ast = gradients.parse('linear-gradient(100grad, red, blue)');
+      expect(ast[0].orientation.type).to.equal('angular');
+      expect(ast[0].orientation.value).to.equal('100');
+      expect(ast[0].orientation.unit).to.equal('grad');
+    });
+
+    it('should parse turn angle unit', function() {
+      var ast = gradients.parse('linear-gradient(0.25turn, red, blue)');
+      expect(ast[0].orientation.type).to.equal('angular');
+      expect(ast[0].orientation.value).to.equal('0.25');
+      expect(ast[0].orientation.unit).to.equal('turn');
+    });
+
+    it('should preserve deg unit in AST', function() {
+      var ast = gradients.parse('linear-gradient(45deg, red, blue)');
+      expect(ast[0].orientation.unit).to.equal('deg');
+    });
+
+    it('should preserve rad unit in AST', function() {
+      var ast = gradients.parse('linear-gradient(1rad, red, blue)');
+      expect(ast[0].orientation.unit).to.equal('rad');
+    });
+  });
+
+  describe('parse additional CSS length units', function() {
+    [
+      {unit: 'rem', input: '2rem'},
+      {unit: 'vw', input: '50vw'},
+      {unit: 'vh', input: '100vh'},
+      {unit: 'vmin', input: '10vmin'},
+      {unit: 'vmax', input: '90vmax'},
+      {unit: 'ch', input: '5ch'},
+      {unit: 'ex', input: '3ex'}
+    ].forEach(function(tc) {
+      it('should parse ' + tc.unit + ' unit in color stop', function() {
+        var ast = gradients.parse('linear-gradient(red ' + tc.input + ', blue)');
+        expect(ast[0].colorStops[0].length.type).to.equal(tc.unit);
+      });
+    });
+  });
+
+  describe('parse CSS Color Level 4 space-separated syntax', function() {
+    it('should parse rgb with space-separated values', function() {
+      var ast = gradients.parse('linear-gradient(rgb(255 0 128), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['255', '0', '128']);
+    });
+
+    it('should parse rgb with slash alpha', function() {
+      var ast = gradients.parse('linear-gradient(rgb(255 0 128 / 0.5), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('rgba');
+      expect(ast[0].colorStops[0].value).to.eql(['255', '0', '128', '0.5']);
+    });
+
+    it('should parse hsl with space-separated values', function() {
+      var ast = gradients.parse('linear-gradient(hsl(120 60% 70%), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('hsl');
+      expect(ast[0].colorStops[0].value).to.eql(['120', '60', '70']);
+    });
+
+    it('should parse hsl with slash alpha', function() {
+      var ast = gradients.parse('linear-gradient(hsl(120 60% 70% / 0.5), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('hsla');
+      expect(ast[0].colorStops[0].value).to.eql(['120', '60', '70', '0.5']);
+    });
+
+    it('should still parse legacy comma-separated rgb', function() {
+      var ast = gradients.parse('linear-gradient(rgb(255, 0, 128), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('rgb');
+      expect(ast[0].colorStops[0].value).to.eql(['255', '0', '128']);
+    });
+
+    it('should still parse legacy comma-separated hsl', function() {
+      var ast = gradients.parse('linear-gradient(hsl(120, 60%, 70%), blue)');
+      expect(ast[0].colorStops[0].type).to.equal('hsl');
+      expect(ast[0].colorStops[0].value).to.eql(['120', '60', '70']);
+    });
+  });
+
+  describe('parse dual color stop positions', function() {
+    it('should parse color stop with two positions', function() {
+      var ast = gradients.parse('linear-gradient(red 10% 30%, blue)');
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length.value).to.equal('10');
+      expect(ast[0].colorStops[0].length2.type).to.equal('%');
+      expect(ast[0].colorStops[0].length2.value).to.equal('30');
+    });
+
+    it('should parse dual positions with px', function() {
+      var ast = gradients.parse('linear-gradient(red 10px 50px, blue)');
+      expect(ast[0].colorStops[0].length.type).to.equal('px');
+      expect(ast[0].colorStops[0].length.value).to.equal('10');
+      expect(ast[0].colorStops[0].length2.type).to.equal('px');
+      expect(ast[0].colorStops[0].length2.value).to.equal('50');
+    });
+
+    it('should not set length2 for single position', function() {
+      var ast = gradients.parse('linear-gradient(red 50%, blue)');
+      expect(ast[0].colorStops[0].length.type).to.equal('%');
+      expect(ast[0].colorStops[0].length2).to.be(undefined);
+    });
+  });
+
+  describe('hex color validation', function() {
+    it('should parse 3-digit hex', function() {
+      var ast = gradients.parse('linear-gradient(#fff, blue)');
+      expect(ast[0].colorStops[0].value).to.equal('fff');
+    });
+
+    it('should parse 4-digit hex (with alpha)', function() {
+      var ast = gradients.parse('linear-gradient(#fffa, blue)');
+      expect(ast[0].colorStops[0].value).to.equal('fffa');
+    });
+
+    it('should parse 6-digit hex', function() {
+      var ast = gradients.parse('linear-gradient(#ff00ff, blue)');
+      expect(ast[0].colorStops[0].value).to.equal('ff00ff');
+    });
+
+    it('should parse 8-digit hex (with alpha)', function() {
+      var ast = gradients.parse('linear-gradient(#ff00ff80, blue)');
+      expect(ast[0].colorStops[0].value).to.equal('ff00ff80');
+    });
+
+    it('should reject invalid hex lengths', function() {
+      expect(function() {
+        gradients.parse('linear-gradient(#ff, blue)');
+      }).to.throwException();
+      expect(function() {
+        gradients.parse('linear-gradient(#fffff, blue)');
+      }).to.throwException();
+      expect(function() {
+        gradients.parse('linear-gradient(#fffffff, blue)');
+      }).to.throwException();
+    });
+  });
+
 });
