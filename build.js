@@ -79,6 +79,26 @@ async function build() {
     }
   }
 
+  // Build ESM entry point (always, when building node)
+  if (buildNode) {
+    console.log('Building esm.mjs bundle...');
+
+    const stringifyContent = fs.readFileSync(path.join(__dirname, 'lib', 'stringify.js'), 'utf8');
+    const parserContent = fs.readFileSync(path.join(__dirname, 'lib', 'parser.js'), 'utf8');
+
+    const esmBundle = `${stringifyContent}\n${parserContent}\nexport const parse = GradientParser.parse;\nexport const stringify = GradientParser.stringify;\nexport default { parse: GradientParser.parse, stringify: GradientParser.stringify };\n`;
+
+    const esmOutputPath = path.join(__dirname, 'build', 'esm.mjs');
+
+    if (minify) {
+      await minifyCode(esmBundle, esmOutputPath);
+      console.log('✓ ESM bundle created and minified successfully');
+    } else {
+      fs.writeFileSync(esmOutputPath, esmBundle);
+      console.log('✓ ESM bundle created successfully');
+    }
+  }
+
   // If no arguments were provided, we built both bundles
   if (!args.length) {
     console.log('✓ All bundles built successfully');

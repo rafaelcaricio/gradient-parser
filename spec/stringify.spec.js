@@ -113,6 +113,91 @@ describe('lib/stringify.js', function () {
       });
     });
 
+    describe('angle unit preservation', function() {
+      it('should round-trip rad values', function() {
+        var gradientDef = 'linear-gradient(1rad, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip grad values', function() {
+        var gradientDef = 'linear-gradient(100grad, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip turn values', function() {
+        var gradientDef = 'linear-gradient(0.25turn, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip deg values', function() {
+        var gradientDef = 'linear-gradient(45deg, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+    });
+
+    describe('conic-gradient serialization', function() {
+      it('should round-trip simple conic-gradient', function() {
+        var gradientDef = 'conic-gradient(red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip conic-gradient with from angle', function() {
+        var gradientDef = 'conic-gradient(from 45deg, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip conic-gradient with at position', function() {
+        var gradientDef = 'conic-gradient(at 50% 50%, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip conic-gradient with from and at', function() {
+        var gradientDef = 'conic-gradient(from 90deg at 25% 75%, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip repeating-conic-gradient', function() {
+        var gradientDef = 'repeating-conic-gradient(from 0deg, red 0%, blue 25%)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+    });
+
+    describe('additional length units', function() {
+      [
+        'rem',
+        'vw',
+        'vh',
+        'vmin',
+        'vmax',
+        'ch',
+        'ex'
+      ].forEach(function(unit) {
+        it('should round-trip ' + unit + ' unit', function() {
+          var gradientDef = 'linear-gradient(blue 10' + unit + ', transparent)';
+          expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+        });
+      });
+    });
+
+    describe('radial with explicit at keyword', function() {
+      it('should round-trip radial-gradient with at position', function() {
+        var gradientDef = 'radial-gradient(at 57% 50%, red, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+    });
+
+    describe('dual color stop positions', function() {
+      it('should round-trip dual percentage positions', function() {
+        var gradientDef = 'linear-gradient(red 10% 30%, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+
+      it('should round-trip dual px positions', function() {
+        var gradientDef = 'linear-gradient(red 10px 50px, blue)';
+        expect(gradients.stringify(gradients.parse(gradientDef))).to.equal(gradientDef);
+      });
+    });
+
   });
 
 });
