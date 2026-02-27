@@ -828,5 +828,6 @@ GradientParser.parse = (function() {
   };
 })();
 
-exports.parse = GradientParser.parse;
-exports.stringify = GradientParser.stringify;
+export const parse = GradientParser.parse;
+export const stringify = GradientParser.stringify;
+export default { parse: GradientParser.parse, stringify: GradientParser.stringify };

@@ -24,19 +24,31 @@
     "url": "git://github.com/rafaelcaricio/gradient-parser.git"
   },
   "main": "build/node.js",
+  "module": "build/esm.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/esm.mjs",
+      "require": "./build/node.js",
+      "types": "./index.d.ts"
+    }
+  },
   "scripts": {
     "test": "mocha spec/**/*.js",
+    "pretest": "npm run build",
     "build": "node build.js",
     "build:node": "node build.js --node",
     "build:web": "node build.js --web",
     "build:minify": "node build.js --minify",
-    "start": "python -m SimpleHTTPServer 3000",
+    "start": "python3 -m http.server 3000",
     "prepublish": "npm run build"
   },
   "keywords": [
     "library",
+    "css",
     "css3",
-    "parser"
+    "parser",
+    "gradient"
   ],
   "devDependencies": {
     "expect.js": "^0.3.1",
