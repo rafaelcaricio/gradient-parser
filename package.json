@@ -52,7 +52,7 @@
   ],
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "mocha": "^10.3.0"
   },
   "engines": {
